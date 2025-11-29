@@ -8,6 +8,7 @@ import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import ToolFormModal from '../components/tools/ToolFormModal';
+import CategoryManagerModal from '../components/tools/CategoryManagerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
   
   // Admin CRUD state
   const [showToolModal, setShowToolModal] = useState(false);
+  const [showCatManager, setShowCatManager] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingToolId, setDeletingToolId] = useState(null);
@@ -142,18 +144,27 @@ export default function Home() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-white text-2xl font-bold">Catálogo Maestro</h2>
               
-              {/* Botón Nueva Herramienta (Admin only) */}
+              {/* Botones Admin */}
               {user && (
-                <button
-                  onClick={() => {
-                    setEditingTool(null);
-                    setShowToolModal(true);
-                  }}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg"
-                >
-                  <PlusCircle size={18} />
-                  Nueva Herramienta
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowCatManager(true)}
+                    className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-lg text-sm font-bold transition-all border border-slate-600"
+                  >
+                    <Filter size={16} />
+                    Gestionar Categorías
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingTool(null);
+                      setShowToolModal(true);
+                    }}
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg"
+                  >
+                    <PlusCircle size={18} />
+                    Nueva Herramienta
+                  </button>
+                </div>
               )}
             </div>
 
@@ -277,6 +288,13 @@ export default function Home() {
         tool={editingTool}
         onSave={handleSaveTool}
         existingCategories={categories.filter(c => c !== "Todas")}
+      />
+
+      <CategoryManagerModal
+        isOpen={showCatManager}
+        onClose={() => setShowCatManager(false)}
+        categories={categories}
+        onRefresh={fetchTools}
       />
 
       <ConfirmDialog
