@@ -35,7 +35,8 @@ export default function Home() {
     const { data, error } = await supabase
       .from('tools')
       .select('*')
-      .order('name');
+      .order('name')
+      .range(0, 2800);
     
     if (!error) setTools(data);
     setLoading(false);
