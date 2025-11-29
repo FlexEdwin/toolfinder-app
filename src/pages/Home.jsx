@@ -1,32 +1,43 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Filter, Loader2 } from 'lucide-react';
+import { Search, Filter, Loader2, PlusCircle } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
 import { Link } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
+import ToolFormModal from '../components/tools/ToolFormModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function Home() {
   const { count } = useKit();
+  const { user } = useAuth();
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("null");
+  
+  // Admin CRUD state
+  const [showToolModal, setShowToolModal] = useState(false);
+  const [editingTool, setEditingTool] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingToolId, setDeletingToolId] = useState(null);
 
   // 1. Cargar datos al iniciar
   useEffect(() => {
-    async function fetchTools() {
-      // Traemos TODO el catálogo. Si son miles, usaremos paginación luego.
-      const { data, error } = await supabase
-        .from('tools')
-        .select('*')
-        .order('name');
-      
-      if (!error) setTools(data);
-      setLoading(false);
-    }
     fetchTools();
   }, []);
+
+  async function fetchTools() {
+    const { data, error } = await supabase
+      .from('tools')
+      .select('*')
+      .order('name');
+    
+    if (!error) setTools(data);
+    setLoading(false);
+  }
 
   // 2. Extraer categorías únicas dinámicamente
   const categories = useMemo(() => {
@@ -47,6 +58,78 @@ export default function Home() {
     return matchesSearch && matchesCategory;
   });
 
+  // CRUD Functions
+  const handleSaveTool = async (toolData) => {
+    try {
+      if (editingTool) {
+        // UPDATE
+        const { error } = await supabase
+          .from('tools')
+          .update(toolData)
+          .eq('id', editingTool.id);
+
+        if (error) throw error;
+
+        // Update local state
+        setTools(prev => prev.map(t => 
+          t.id === editingTool.id ? { ...t, ...toolData } : t
+        ));
+        toast.success("✅ Herramienta actualizada");
+      } else {
+        // CREATE
+        const { data, error } = await supabase
+          .from('tools')
+          .insert([toolData])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Add to local state
+        setTools(prev => [...prev, data]);
+        toast.success("✅ Herramienta creada con éxito");
+      }
+
+      setShowToolModal(false);
+      setEditingTool(null);
+    } catch (error) {
+      console.error('Error saving tool:', error);
+      if (error.code === '23505') {
+        toast.error("⚠️ Ya existe una herramienta con ese Part Number");
+      } else {
+        toast.error("⚠️ Error al guardar: " + error.message);
+      }
+      throw error; // Re-throw to keep modal open
+    }
+  };
+
+  const handleEditTool = (tool) => {
+    setEditingTool(tool);
+    setShowToolModal(true);
+  };
+
+  const handleDeleteTool = (toolId) => {
+    setDeletingToolId(toolId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from('tools')
+        .delete()
+        .eq('id', deletingToolId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setTools(prev => prev.filter(t => t.id !== deletingToolId));
+      toast.success("✅ Herramienta eliminada");
+    } catch (error) {
+      toast.error("⚠️ Error al eliminar: " + error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       
@@ -56,7 +139,24 @@ export default function Home() {
           
           {/* Título + Buscador */}
           <div className="max-w-3xl">
-            <h2 className="text-white text-2xl font-bold mb-4">Catálogo Maestro</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-white text-2xl font-bold">Catálogo Maestro</h2>
+              
+              {/* Botón Nueva Herramienta (Admin only) */}
+              {user && (
+                <button
+                  onClick={() => {
+                    setEditingTool(null);
+                    setShowToolModal(true);
+                  }}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg"
+                >
+                  <PlusCircle size={18} />
+                  Nueva Herramienta
+                </button>
+              )}
+            </div>
+
             <div className="relative group">
               <input
                 type="text"
@@ -117,7 +217,13 @@ export default function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredTools.map(tool => (
-                <ToolCard key={tool.id} tool={tool} />
+                <ToolCard 
+                  key={tool.id} 
+                  tool={tool}
+                  isAdmin={!!user}
+                  onEdit={handleEditTool}
+                  onDelete={handleDeleteTool}
+                />
               ))}
             </div>
 
@@ -160,6 +266,26 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <ToolFormModal
+        isOpen={showToolModal}
+        onClose={() => {
+          setShowToolModal(false);
+          setEditingTool(null);
+        }}
+        tool={editingTool}
+        onSave={handleSaveTool}
+        existingCategories={categories.filter(c => c !== "Todas")}
+      />
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDelete}
+        title="¿Eliminar herramienta?"
+        message="Esta acción es permanente y no se puede deshacer. La herramienta será eliminada del catálogo."
+      />
     </div>
   );
 }

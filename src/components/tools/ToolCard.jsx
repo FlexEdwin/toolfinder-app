@@ -1,10 +1,10 @@
-import { Copy, FolderPlus, Check, Zap, Shield, Wrench, Ruler } from 'lucide-react'; // Importar Check
+import { Copy, FolderPlus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { useKit } from '../../context/KitContext'; // <--- Importar el hook
+import { useKit } from '../../context/KitContext';
 
-export default function ToolCard({ tool }) {
+export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
-  const { selectedTools, toggleTool } = useKit(); // <--- Usar el contexto
+  const { selectedTools, toggleTool } = useKit();
 
   // Verificar si esta herramienta ya está en el carrito
   const isSelected = selectedTools.some(t => t.id === tool.id);
@@ -32,6 +32,36 @@ export default function ToolCard({ tool }) {
           {tool.category}
         </span>
       </div>
+
+      {/* Admin Controls */}
+      {isAdmin && (onEdit || onDelete) && (
+        <div className="absolute top-2 left-2 flex gap-1 z-10">
+          {onEdit && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(tool);
+              }}
+              className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors shadow-md"
+              title="Editar herramienta"
+            >
+              <Pencil size={14} />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(tool.id);
+              }}
+              className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors shadow-md"
+              title="Eliminar herramienta"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="p-5 flex-grow">
         <div className="mb-3">
