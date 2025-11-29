@@ -11,7 +11,7 @@ export default function Home() {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Todas");
+  const [selectedCategory, setSelectedCategory] = useState("null");
 
   // 1. Cargar datos al iniciar
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function Home() {
             {categories.map(cat => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
                 className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === cat 
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
@@ -96,10 +96,23 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <div className="flex justify-between items-end mb-4 px-1">
-              <p className="text-sm text-slate-500 font-medium">
-                Mostrando {filteredTools.length} herramientas
-              </p>
+            <div className="flex justify-between items-center mb-6 px-1">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
+                  <span className="text-blue-900 font-bold text-lg">{filteredTools.length}</span>
+                  <span className="text-blue-600 text-sm ml-2">
+                    {filteredTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
+                  </span>
+                </div>
+                {(searchTerm || selectedCategory !== "Todas") && (
+                  <button
+                    onClick={() => {setSearchTerm(""); setSelectedCategory("Todas")}}
+                    className="text-slate-500 hover:text-slate-700 text-sm font-medium underline"
+                  >
+                    Limpiar filtros
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

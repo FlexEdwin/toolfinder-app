@@ -1,7 +1,7 @@
-import { Heart, User, Calendar, Wrench, Trophy } from 'lucide-react';
-import { useState } from 'react';
+import { Heart, User, Calendar, Wrench, Trophy, Trash2 } from 'lucide-react';
+import { useState, memo } from 'react';
 
-export default function KitCard({ kit, rank, onToggleLike, currentUserId }) {
+const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, isAdmin, onDelete }) {
   // Validación de datos para prevenir errores
   if (!kit || !kit.id) {
     console.error('KitCard: Invalid kit data', kit);
@@ -37,6 +37,18 @@ export default function KitCard({ kit, rank, onToggleLike, currentUserId }) {
       
       {/* Badge de Ranking */}
       {getRankBadge(rank)}
+
+      {/* BOTÓN ADMIN DE BORRADO */}
+      {isAdmin && onDelete && (
+        <button 
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          className="absolute top-2 right-2 p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors z-20 shadow-md"
+          title="Borrar Lista (Admin)"
+          aria-label={`Eliminar lista ${kit.name || 'esta lista'}`}
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
 
       <div className="p-5">
         {/* Cabecera */}
@@ -98,4 +110,6 @@ export default function KitCard({ kit, rank, onToggleLike, currentUserId }) {
       </div>
     </div>
   );
-}
+});
+
+export default KitCard;

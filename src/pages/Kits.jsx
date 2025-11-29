@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Loader2, TrendingUp, AlertCircle } from 'lucide-react';
 import KitCard from '../components/social/KitCard';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 
 export default function Kits() {
+  const { user } = useAuth(); // Si user existe, eres Admin
   const [kits, setKits] = useState([]);
   const [loading, setLoading] = useState(true);
   const anonId = localStorage.getItem('toolfinder_anon_id');
@@ -85,6 +88,22 @@ export default function Kits() {
     }
   };
 
+  // Función para borrar kit (solo admin)
+  const handleDeleteKit = async (kitId) => {
+    if (!window.confirm("¿Seguro que quieres eliminar esta lista permanentemente?")) return;
+    
+    try {
+      const { error } = await supabase.from('kits').delete().eq('id', kitId);
+      if (error) throw error;
+      
+      // Actualizar UI localmente quitando el kit borrado
+      setKits(prev => prev.filter(k => k.id !== kitId));
+      toast.success("✅ Lista eliminada correctamente");
+    } catch (err) {
+      toast.error("⚠️ Error al borrar: " + err.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       
@@ -121,6 +140,8 @@ export default function Kits() {
                 rank={index} 
                 onToggleLike={handleToggleLike}
                 currentUserId={anonId}
+                isAdmin={!!user}
+                onDelete={() => handleDeleteKit(kit.id)}
               />
             ))}
           </div>

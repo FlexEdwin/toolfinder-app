@@ -1,10 +1,10 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Wrench, LogIn, User, Menu, PlusCircle } from 'lucide-react';
+import { Wrench, Menu, PlusCircle, LogOut } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Layout() {
-  const { user } = useAuth(); // Solo usamos 'user' para saber si eres Tú (Admin)
+  const { user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -25,7 +25,7 @@ export default function Layout() {
             <Link to="/" className="text-sm font-medium hover:text-white text-slate-300 transition-colors">Buscador</Link>
             <Link to="/kits" className="text-sm font-medium hover:text-white text-slate-300 transition-colors">Listas de la Comunidad</Link>
             
-            {/* Botón de Acción Principal (Ahora visible para todos) */}
+            {/* Botón de Acción Principal */}
             <Link 
               to="/create" 
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-bold transition-all shadow-lg shadow-blue-900/50"
@@ -33,11 +33,20 @@ export default function Layout() {
               <PlusCircle size={16} /> Crear Lista
             </Link>
 
-            {/* Solo mostramos Avatar si eres Admin/Logueado */}
+            {/* Admin Badge y Logout */}
             {user && (
-              <div className="ml-4 pl-4 border-l border-slate-700 text-xs text-green-400 font-mono">
-                ADMIN: ON
-              </div>
+              <>
+                <div className="ml-4 pl-4 border-l border-slate-700 text-xs text-green-400 font-mono">
+                  ADMIN: ON
+                </div>
+                <button
+                  onClick={signOut}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 rounded-md text-xs font-medium transition-colors border border-red-800/50"
+                  title="Cerrar Sesión"
+                >
+                  <LogOut size={14} /> Salir
+                </button>
+              </>
             )}
           </nav>
 
@@ -53,6 +62,9 @@ export default function Layout() {
             <Link to="/" className="block text-slate-300" onClick={() => setIsMenuOpen(false)}>Buscador</Link>
             <Link to="/kits" className="block text-slate-300" onClick={() => setIsMenuOpen(false)}>Ver Listas</Link>
             <Link to="/create" className="block text-blue-400 font-bold" onClick={() => setIsMenuOpen(false)}>+ Crear Lista Nueva</Link>
+            {user && (
+              <button onClick={signOut} className="block text-red-400 font-bold">Cerrar Sesión</button>
+            )}
           </div>
         )}
       </header>
@@ -78,7 +90,7 @@ export default function Layout() {
             <a href="mailto:flexedwin@hotmail.com" className="hover:text-blue-400 transition-colors">
               Soporte: flexedwin@hotmail.com
             </a>
-            {/* Link discreto para que TU entres como admin */}
+            {/* Link discreto para admin */}
             <div className="mt-2">
                 <Link to="/login" className="text-slate-700 hover:text-slate-500">Admin Access</Link>
             </div>

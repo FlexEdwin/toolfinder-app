@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
 import { supabase } from '../lib/supabaseClient';
-import { Save, User, Package, Trash2, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { Save, User, Package, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function CreateKit() {
   const { selectedTools, toggleTool, clearKit } = useKit();
@@ -11,7 +12,6 @@ export default function CreateKit() {
   const [kitName, setKitName] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
 
   // Si no hay herramientas, mostrar aviso
   if (selectedTools.length === 0) {
@@ -32,12 +32,11 @@ export default function CreateKit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!kitName.trim() || !authorName.trim()) {
-      setErrorMsg("Por favor completa todos los campos.");
+      toast.error("⚠️ Por favor completa todos los campos");
       return;
     }
 
     setIsSubmitting(true);
-    setErrorMsg("");
 
     try {
       // 1. Crear el KIT (Cabecera)
@@ -47,7 +46,6 @@ export default function CreateKit() {
           { 
             name: kitName, 
             author_name: authorName,
-            // author_id: null (se va nulo porque es anónimo/abierto)
           }
         ])
         .select()
@@ -68,12 +66,13 @@ export default function CreateKit() {
       if (itemsError) throw itemsError;
 
       // 3. Éxito: Limpiar y Redirigir
+      toast.success("✅ Lista creada con éxito");
       clearKit();
       navigate('/kits');
       
     } catch (error) {
       console.error(error);
-      setErrorMsg("Hubo un error al guardar. Intenta de nuevo.");
+      toast.error("⚠️ Error al guardar: " + error.message);
       setIsSubmitting(false);
     }
   };
@@ -121,12 +120,6 @@ export default function CreateKit() {
                 <User className="absolute left-3 top-3.5 text-slate-400" size={18} />
               </div>
             </div>
-
-            {errorMsg && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2">
-                <AlertCircle size={16} /> {errorMsg}
-              </div>
-            )}
 
             <button 
               type="submit" 

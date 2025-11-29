@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
 import { KitProvider } from './context/KitContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import CreateKit from './pages/CreateKit';
 import Kits from './pages/Kits';
+import Login from './pages/Login';
 
 function App() {
   if (!localStorage.getItem('toolfinder_anon_id')) {
@@ -13,11 +16,16 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <KitProvider> {/* <--- ENVOLVER AQUÍ */}
+        <KitProvider>
+          <Toaster position="bottom-right" richColors />
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
-              <Route path="login" element={<div>Login</div>} />
+              <Route path="login" element={
+                <ProtectedRoute redirectIfAuth={true}>
+                  <Login />
+                </ProtectedRoute>
+              } />
               <Route path="kits" element={<Kits />} />
               <Route path="create" element={<CreateKit />} />
             </Route>
