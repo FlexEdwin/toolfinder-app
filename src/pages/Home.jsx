@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Loader2, PlusCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Loader2, PlusCircle } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
 import { Link } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
@@ -10,20 +10,18 @@ import { toast } from 'sonner';
 import ToolFormModal from '../components/tools/ToolFormModal';
 import CategoryManagerModal from '../components/tools/CategoryManagerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
-
-const ITEMS_PER_PAGE = 200;
+import { useTools } from '../hooks/useTools';
+import { useCategories } from '../hooks/useCategories';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
   const { count } = useKit();
   const { user } = useAuth();
-  const [tools, setTools] = useState([]);
-  const [allTools, setAllTools] = useState([]); // For category extraction
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  
+  // Local UI state
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("Todas");
-  const debounceTimer = useRef(null);
   
   // Admin CRUD state
   const [showToolModal, setShowToolModal] = useState(false);
@@ -32,126 +30,27 @@ export default function Home() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingToolId, setDeletingToolId] = useState(null);
 
-  // Extract categories from all tools
-  const categories = useMemo(() => {
-    const cats = new Set(allTools.map(t => t.category).filter(Boolean));
-    return ["Todas", ...Array.from(cats).sort()];
-  }, [allTools]);
+  // React Query hooks
+  const { data: tools = [], isLoading, isError, error } = useTools({
+    search: searchTerm,
+    category: selectedCategory,
+    page: 1,
+  });
 
-  // Fetch all tools for category extraction
-  const fetchAllToolsForCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('tools')
-        .select('category')
-        .not('category', 'is', null);
-      
-      if (error) throw error;
-      setAllTools(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
+  const { data: categoriesData = [], isLoading: loadingCats } = useCategories();
 
-  // Fetch tools - either default or search
-  const fetchTools = async (page = 1, search = "", category = "Todas") => {
-    setLoading(true);
+  // Filter tools locally for now (until RPC is ready)
+  const filteredTools = tools.filter(tool => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = 
+      tool.name?.toLowerCase().includes(searchLower) || 
+      tool.part_number?.toLowerCase().includes(searchLower) ||
+      tool.keywords?.toLowerCase().includes(searchLower);
     
-    try {
-      if (search.trim()) {
-        // Server-side search using RPC
-        const { data, error } = await supabase
-          .rpc('search_tools_partial', {
-            search_term: search,
-            page_number: page,
-            items_per_page: ITEMS_PER_PAGE
-          });
-
-        if (error) throw error;
-        
-        // Client-side category filter on search results
-        let filteredData = data || [];
-        if (category !== "Todas") {
-          filteredData = filteredData.filter(t => t.category === category);
-        }
-        
-        setTools(filteredData);
-        setTotalResults(filteredData.length);
-      } else {
-        // Default load with server-side category filter
-        const startRange = (page - 1) * ITEMS_PER_PAGE;
-        const endRange = startRange + ITEMS_PER_PAGE - 1;
-        
-        let query = supabase
-          .from('tools')
-          .select('*', { count: 'exact' })
-          .order('name', { ascending: true });
-        
-        // Apply category filter on server if not "Todas"
-        if (category !== "Todas") {
-          query = query.eq('category', category);
-        }
-        
-        const { data, error, count } = await query.range(startRange, endRange);
-
-        if (error) throw error;
-        
-        setTools(data || []);
-        setTotalResults(count || 0);
-      }
-    } catch (error) {
-      console.error('Error fetching tools:', error);
-      toast.error("⚠️ Error al cargar herramientas");
-      setTools([]);
-      setTotalResults(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial load
-  useEffect(() => {
-    fetchAllToolsForCategories();
-    fetchTools(1, "", "Todas");
-  }, []);
-
-  // Debounced search effect
-  useEffect(() => {
-    // Clear existing timer
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-
-    // Set new timer
-    debounceTimer.current = setTimeout(() => {
-      setCurrentPage(1); // Reset to page 1 on new search
-      fetchTools(1, searchTerm, selectedCategory);
-    }, 500);
-
-    // Cleanup
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-    };
-  }, [searchTerm]);
-
-  // Handle page change
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-    fetchTools(newPage, searchTerm, selectedCategory);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Handle category change
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-    fetchTools(1, searchTerm, category);
-  };
-
-  // Calculate total pages
-  const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
+    const matchesCategory = selectedCategory === "Todas" || tool.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   // CRUD Functions
   const handleSaveTool = async (toolData) => {
@@ -166,9 +65,6 @@ export default function Home() {
         if (error) throw error;
 
         toast.success("✅ Herramienta actualizada");
-        // Refresh current page and categories
-        fetchAllToolsForCategories();
-        fetchTools(currentPage, searchTerm, selectedCategory);
       } else {
         // CREATE
         const { data, error } = await supabase
@@ -180,10 +76,15 @@ export default function Home() {
         if (error) throw error;
 
         toast.success("✅ Herramienta creada con éxito");
-        // Refresh current page and categories
-        fetchAllToolsForCategories();
-        fetchTools(currentPage, searchTerm, selectedCategory);
+        
+        // Invalidate categories if new category was added
+        if (toolData.category && !categoriesData.includes(toolData.category)) {
+          queryClient.invalidateQueries({ queryKey: ['categories'] });
+        }
       }
+
+      // Invalidate tools query to refetch
+      queryClient.invalidateQueries({ queryKey: ['tools'] });
 
       setShowToolModal(false);
       setEditingTool(null);
@@ -219,9 +120,10 @@ export default function Home() {
 
       toast.success("✅ Herramienta eliminada");
       setShowDeleteConfirm(false);
-      // Refresh current page and categories
-      fetchAllToolsForCategories();
-      fetchTools(currentPage, searchTerm, selectedCategory);
+      
+      // Invalidate queries to refetch
+      queryClient.invalidateQueries({ queryKey: ['tools'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
     } catch (error) {
       toast.error("⚠️ Error al eliminar: " + error.message);
     }
@@ -246,6 +148,7 @@ export default function Home() {
                     onClick={() => setShowCatManager(true)}
                     className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-lg text-sm font-bold transition-all border border-slate-600"
                   >
+                    <Filter size={16} />
                     Gestionar Categorías
                   </button>
                   <button
@@ -271,7 +174,7 @@ export default function Home() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <Search className="absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-400 transition-colors" size={24} />
-              {loading && (
+              {isLoading && (
                 <Loader2 className="absolute right-4 top-4 text-blue-400 animate-spin" size={24} />
               )}
             </div>
@@ -279,78 +182,75 @@ export default function Home() {
 
           {/* Filtros de Categoría (Pill Shapes) */}
           <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  selectedCategory === cat 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {/* Botón "Todas" fijo */}
+            <button
+              onClick={() => setSelectedCategory("Todas")}
+              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                selectedCategory === "Todas" 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+              }`}
+            >
+              Todas
+            </button>
+            
+            {/* Categorías dinámicas */}
+            {loadingCats ? (
+              <span className="text-slate-400 text-sm px-4 py-1.5">Cargando filtros...</span>
+            ) : (
+              categoriesData.map(cat => (
+                <button
+                  key={cat.category}
+                  onClick={() => setSelectedCategory(cat.category)}
+                  className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                    selectedCategory === cat.category 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                  }`}
+                >
+                  {cat.category}
+                </button>
+              ))
+            )}
           </div>
         </div>
       </div>
 
       {/* --- RESULTADOS (GRILLA) --- */}
       <div className="max-w-6xl mx-auto px-4 -mt-6">
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-blue-600" size={40} />
+          </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-red-200">
+            <Filter className="text-red-500 mb-4" size={48} />
+            <h3 className="text-lg font-bold text-red-700 mb-2">Error al cargar herramientas</h3>
+            <p className="text-red-600 text-sm">{error?.message || 'Ocurrió un error inesperado'}</p>
           </div>
         ) : (
           <>
             <div className="flex justify-between items-center mb-6 px-1">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
-                  <span className="text-blue-900 font-bold text-lg">{tools.length}</span>
+                  <span className="text-blue-900 font-bold text-lg">{filteredTools.length}</span>
                   <span className="text-blue-600 text-sm ml-2">
-                    {searchTerm ? 'resultados' : 'herramientas'}
+                    {filteredTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
                   </span>
                 </div>
                 {(searchTerm || selectedCategory !== "Todas") && (
                   <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setSelectedCategory("Todas");
-                    }}
+                    onClick={() => {setSearchTerm(""); setSelectedCategory("Todas");}}
                     className="text-slate-500 hover:text-slate-700 text-sm font-medium underline"
                   >
                     Limpiar filtros
                   </button>
                 )}
               </div>
-
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <span className="text-slate-900 font-bold px-3">
-                    Página {currentPage} de {totalPages}
-                  </span>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tools.map(tool => (
+              {filteredTools.map(tool => (
                 <ToolCard 
                   key={tool.id} 
                   tool={tool}
@@ -361,49 +261,15 @@ export default function Home() {
               ))}
             </div>
 
-            {tools.length === 0 && (
+            {filteredTools.length === 0 && (
               <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
-                <Search className="mx-auto text-slate-300 mb-2" size={48} />
-                <p className="text-slate-500">
-                  {searchTerm 
-                    ? `No encontramos herramientas que coincidan con "${searchTerm}"`
-                    : "No hay herramientas disponibles"}
-                </p>
-                {(searchTerm || selectedCategory !== "Todas") && (
-                  <button 
-                    onClick={() => {
-                      setSearchTerm("");
-                      setSelectedCategory("Todas");
-                    }}
-                    className="mt-2 text-blue-600 font-medium hover:underline"
-                  >
-                    Limpiar filtros
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Bottom Pagination */}
-            {totalPages > 1 && tools.length > 0 && (
-              <div className="flex justify-center items-center gap-2 mt-8">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
+                <Filter className="mx-auto text-slate-300 mb-2" size={48} />
+                <p className="text-slate-500">No encontramos herramientas con ese criterio.</p>
+                <button 
+                  onClick={() => {setSearchTerm(""); setSelectedCategory("Todas");}}
+                  className="mt-2 text-blue-600 font-medium hover:underline"
                 >
-                  <ChevronLeft size={18} />
-                  Anterior
-                </button>
-                <span className="text-slate-900 font-bold px-4">
-                  Página {currentPage} de {totalPages}
-                </span>
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
-                >
-                  Siguiente
-                  <ChevronRight size={18} />
+                  Limpiar filtros
                 </button>
               </div>
             )}
@@ -444,16 +310,16 @@ export default function Home() {
         }}
         tool={editingTool}
         onSave={handleSaveTool}
-        existingCategories={categories.filter(c => c !== "Todas")}
+        existingCategories={categoriesData.map(c => c.category)}
       />
 
       <CategoryManagerModal
         isOpen={showCatManager}
         onClose={() => setShowCatManager(false)}
-        categories={categories}
+        categories={["Todas", ...categoriesData.map(c => c.category)]}
         onRefresh={() => {
-          fetchAllToolsForCategories();
-          fetchTools(currentPage, searchTerm, selectedCategory);
+          queryClient.invalidateQueries({ queryKey: ['tools'] });
+          queryClient.invalidateQueries({ queryKey: ['categories'] });
         }}
       />
 
