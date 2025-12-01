@@ -17,7 +17,7 @@ export default function Layout() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight hover:text-blue-400 transition-colors">
             <Wrench className="text-blue-500" size={24} />
-            ToolFinder <span className="text-xs bg-slate-700 px-1.5 py-0.5 rounded text-slate-300 ml-1 font-mono">OPEN</span>
+            ToolFinder <span className="text-xs bg-slate-700 px-1.5 py-0.5 rounded text-slate-300 ml-1 font-mono">DEMO</span>
           </Link>
 
           {/* Navegación Desktop */}
