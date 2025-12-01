@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import CreateKit from './pages/CreateKit';
 import Kits from './pages/Kits';
 import Login from './pages/Login';
+import SystemAnnouncement from './components/SystemAnnouncement';
 
 function App() {
   if (!localStorage.getItem('toolfinder_anon_id')) {
@@ -17,6 +18,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <KitProvider>
+          <SystemAnnouncement />
           <Toaster position="bottom-right" richColors />
           <Routes>
             <Route path="/" element={<Layout />}>

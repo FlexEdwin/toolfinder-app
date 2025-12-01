@@ -334,3 +334,25 @@ Error de compilación: "Return statement is not allowed here" causado por falta 
 
 **Resultado:**
 ✅ Error de sintaxis corregido, aplicación funcional.
+
+---
+
+### [01/12/2024] - IMPLEMENTACIÓN DE ANUNCIO DE SISTEMA (BETA)
+
+**Objetivo:**
+Comunicar a los usuarios el estado "Beta / En Construcción" del proyecto mediante un modal global persistente pero descartable.
+
+**Archivos creados/modificados:**
+
+- `src/components/SystemAnnouncement.jsx` (Nuevo)
+- `src/App.jsx` (Modificado para incluir el componente)
+
+**Características:**
+
+- **Diseño Profesional:** Estilo "Alert/Banner" con colores ámbar/azul, iconos de Lucide y tipografía cuidada.
+- **Persistencia:** Usa `localStorage` (`hide_beta_banner_2025`) para recordar si el usuario ya cerró el anuncio.
+- **Firma Personalizada:** Incluye firma del Lead Developer ("Flex") para dar un toque personal.
+- **Fácil Gestión:** Componente aislado que se puede remover fácilmente de `App.jsx` cuando el proyecto esté estable.
+
+**Resultado:**
+✅ El anuncio aparece al cargar la app y desaparece permanentemente al hacer clic en "Entendido" o cerrar.
