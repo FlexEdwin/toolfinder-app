@@ -1,0 +1,95 @@
+REPORTE DE AUDITORÍA TÉCNICA
+===========================
+
+1. ESTRUCTURA DEL PROYECTO
+--------------------------
+El proyecto está estructurado como una aplicación React moderna utilizando Vite.
+Raíz del proyecto: `toolfinder`
+
+toolfinder/
+├── public/              # Archivos estáticos públicos
+├── src/
+│   ├── assets/          # Recursos estáticos (imágenes, etc.)
+│   ├── components/      # Componentes reutilizables
+│   │   └── tools/       # Componentes específicos de herramientas (ToolCard, Modals)
+│   ├── context/         # Contextos de React (AuthContext, KitContext)
+│   ├── lib/             # Utilidades y configuración (supabaseClient.js)
+│   ├── pages/           # Componentes de página (Home, CreateKit, Kits, Login)
+│   ├── App.jsx          # Componente raíz con rutas
+│   ├── main.jsx         # Punto de entrada
+│   └── index.css        # Estilos globales y directivas Tailwind
+├── .env.local           # Variables de entorno (no versionado)
+├── package.json         # Dependencias y scripts
+├── tailwind.config.js   # Configuración de Tailwind
+└── vite.config.js       # Configuración de Vite
+
+2. STACK TECNOLÓGICO EXACTO
+---------------------------
+Basado en package.json:
+
+- Framework: React 19.2.0
+- Build Tool: Vite 7.2.4
+- UI Libraries: 
+  - TailwindCSS 3.4.16 (Estilos)
+  - Lucide React 0.555.0 (Iconos)
+  - Sonner 2.0.7 (Notificaciones/Toasts)
+- Routing: React Router DOM 7.9.6
+- Backend/Data: Supabase JS 2.86.0
+
+3. CONEXIÓN A DATOS
+-------------------
+- Archivo de inicialización: `src/lib/supabaseClient.js`
+- Cliente: Se utiliza `@supabase/supabase-js`.
+- Variables de Entorno:
+  - Se gestionan a través de `import.meta.env` (estándar de Vite).
+  - Variables requeridas: `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+  - El cliente lanza un error explícito si estas variables faltan.
+
+4. LÓGICA PRINCIPAL (Gestión de Herramientas)
+---------------------------------------------
+- Archivo Principal: `src/pages/Home.jsx`
+- Fetching:
+  - Se realiza una consulta masiva al montar el componente (`useEffect`).
+  - Consulta: `supabase.from('tools').select('*').order('name').range(0, 2800)`
+- Paginación:
+  - NO hay paginación real implementada en el backend para la vista principal.
+  - Se traen hasta 2800 registros de una sola vez (`range(0, 2800)`).
+- Filtrado:
+  - El filtrado es 100% del lado del cliente (Client-side filtering).
+  - Se filtra sobre el array completo `tools` en memoria.
+  - Criterios: Nombre, Número de Parte (part_number), Palabras clave (keywords) y Categoría.
+
+5. ESTILOS Y UI
+---------------
+- Tecnología CSS: Tailwind CSS.
+- Configuración: Estándar, definida en `tailwind.config.js` y `postcss.config.js`.
+- Iconografía: Lucide React.
+- Componentes UI: Diseño personalizado utilizando clases de utilidad de Tailwind (ej: `bg-slate-900`, `text-white`, `rounded-xl`).
+
+6. BASE DE DATOS (INFERENCIA DE SCHEMA)
+---------------------------------------
+Basado en el análisis del código (`Home.jsx`, `ToolCard.jsx`, `CreateKit.jsx`), se identifican las siguientes tablas y columnas:
+
+Tabla: `tools`
+- `id` (PK)
+- `name` (Texto)
+- `part_number` (Texto, único sugerido)
+- `description` (Texto, inferido)
+- `category` (Texto, usado para filtros e iconos)
+- `keywords` (Texto, usado para búsqueda)
+- `specs` (JSON o Texto, mostrado en tarjeta)
+- `image` (Posiblemente existente, pero la UI actual usa iconos dinámicos basados en categoría)
+
+Tabla: `kits`
+- `id` (PK)
+- `name` (Texto)
+- `author_name` (Texto)
+
+Tabla: `kit_items` (Tabla de relación)
+- `kit_id` (FK -> kits.id)
+- `tool_id` (FK -> tools.id)
+
+OBSERVACIONES ADICIONALES
+-------------------------
+- Rendimiento: Cargar 2800 items de golpe puede causar problemas de rendimiento en dispositivos móviles o conexiones lentas. Se recomienda implementar paginación en el servidor o "Infinite Scroll".
+- Seguridad: Se observan controles de administrador (`isAdmin`) en el frontend, pero se debe asegurar que las políticas RLS (Row Level Security) en Supabase respalden estas restricciones.
