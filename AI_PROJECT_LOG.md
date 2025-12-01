@@ -36,10 +36,33 @@
 **Correcciones de UI/UX:**
 
 - **Sistema de Anuncios:** Implementado `SystemAnnouncement.jsx` (Banner Beta persistente con localStorage).
+  - **Refinamiento:** Añadida firma personalizada ("Flex - Lead Developer") y mejorado el diseño visual.
+  - **Persistencia:** Actualizada clave a `hide_beta_banner_2025_v2` para asegurar visualización tras cambios.
 - **Kits:**
   - Corregido el modal de detalles: ahora muestra todas las herramientas del kit.
   - Agregado campo "Nombre" visible en las tarjetas del modal.
   - Conectado correctamente el evento `onClick` en las tarjetas.
+
+---
+
+### [01/12/2025] - MEJORA DE UX EN CONTADOR DE RESULTADOS
+
+**Objetivo:**
+Evitar la confusión del usuario sobre el tamaño de la base de datos debido al límite de paginación de 20 items.
+
+**Archivo modificado:**
+
+- `src/pages/Home.jsx` - Lógica de renderizado del badge de resultados.
+
+**Cambios realizados:**
+Implementada lógica condicional para el texto del contador:
+
+1. **Estado Inicial:** "Explorando Catálogo Maestro (+2,700 herramientas)" cuando no hay filtros activos.
+2. **Límite Alcanzado:** "Mostrando las primeras 20 coincidencias..." cuando los resultados igualan el límite de paginación.
+3. **Búsqueda Exacta:** "{n} herramientas encontradas" para resultados menores a 20.
+
+**Resultado:**
+✅ UX más clara que comunica mejor la magnitud del catálogo y el contexto de los resultados mostrados.
 
 ---
 

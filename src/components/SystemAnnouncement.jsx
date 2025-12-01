@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Construction } from 'lucide-react';
 
 export default function SystemAnnouncement() {
-  const STORAGE_KEY = 'hide_beta_banner_2025';
+  const STORAGE_KEY = 'hide_beta_banner_2025_v2';
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {

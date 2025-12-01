@@ -233,10 +233,22 @@ export default function Home() {
             <div className="flex justify-between items-center mb-6 px-1">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
-                  <span className="text-blue-900 font-bold text-lg">{filteredTools.length}</span>
-                  <span className="text-blue-600 text-sm ml-2">
-                    {filteredTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
-                  </span>
+                  {!searchTerm && selectedCategory === "Todas" ? (
+                    <span className="text-blue-900 font-bold text-sm sm:text-base">
+                      Explorando Catálogo Maestro (+2,700 herramientas)
+                    </span>
+                  ) : filteredTools.length === 20 ? (
+                    <span className="text-blue-900 font-bold text-sm sm:text-base">
+                      Mostrando las primeras 20 coincidencias...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-blue-900 font-bold text-lg">{filteredTools.length}</span>
+                      <span className="text-blue-600 text-sm ml-2">
+                        {filteredTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
+                      </span>
+                    </>
+                  )}
                 </div>
                 {(searchTerm || selectedCategory !== "Todas") && (
                   <button
