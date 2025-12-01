@@ -37,7 +37,7 @@
 
 - **Sistema de Anuncios:** Implementado `SystemAnnouncement.jsx` (Banner Beta persistente con localStorage).
   - **Refinamiento:** Añadida firma personalizada ("Flex - Lead Developer") y mejorado el diseño visual.
-  - **Persistencia:** Actualizada clave a `hide_beta_banner_2025_v2` para asegurar visualización tras cambios.
+  - **Comportamiento:** Configurado para aparecer en cada sesión (sin persistencia en localStorage) por solicitud del usuario.
 - **Kits:**
   - Corregido el modal de detalles: ahora muestra todas las herramientas del kit.
   - Agregado campo "Nombre" visible en las tarjetas del modal.
