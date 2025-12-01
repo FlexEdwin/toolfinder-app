@@ -1,7 +1,7 @@
 import { Heart, User, Calendar, Wrench, Trophy, Trash2 } from 'lucide-react';
 import { useState, memo } from 'react';
 
-const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, isAdmin, onDelete }) {
+const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, isAdmin, onDelete, onViewKit }) {
   // Validación de datos para prevenir errores
   if (!kit || !kit.id) {
     console.error('KitCard: Invalid kit data', kit);
@@ -100,7 +100,13 @@ const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, 
             {likesCount} <span className="font-normal hidden sm:inline">Votos</span>
           </button>
 
+          {/* Ver detalles button - now passes entire kit */}
           <button 
+            onClick={() => {
+              if (onViewKit) {
+                onViewKit(kit);
+              }
+            }}
             className="text-blue-600 text-sm font-medium hover:underline"
             aria-label={`Ver detalles de ${kit.name || 'esta lista'}`}
           >

@@ -1,26 +1,27 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, TrendingUp, AlertCircle } from 'lucide-react';
+import { Loader2, TrendingUp, AlertCircle, X } from 'lucide-react';
 import KitCard from '../components/social/KitCard';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
 export default function Kits() {
-  const { user } = useAuth(); // Si user existe, eres Admin
+  const { user } = useAuth();
   const [kits, setKits] = useState([]);
   const [loading, setLoading] = useState(true);
   const anonId = localStorage.getItem('toolfinder_anon_id');
+  
+  // Modal state
+  const [selectedKit, setSelectedKit] = useState(null);
+  const [showKitModal, setShowKitModal] = useState(false);
 
   const fetchKits = async () => {
     try {
-      // Llamada optimizada usando RPC function de Supabase
-      // Esta función SQL cuenta los likes directamente en la base de datos
       const { data: kitsData, error } = await supabase
         .rpc('get_kits_with_likes', { user_session_id: anonId })
         .order('likes_count', { ascending: false });
 
       if (error) {
-        // Si la función RPC no existe, fallback al método manual
         console.warn('RPC function not found, using fallback method');
         return await fetchKitsFallback();
       }
@@ -28,14 +29,12 @@ export default function Kits() {
       setKits(kitsData || []);
     } catch (err) {
       console.error("Error cargando kits:", err);
-      // Intentar método fallback en caso de error
       await fetchKitsFallback();
     } finally {
       setLoading(false);
     }
   };
 
-  // Método fallback (el código original) por si la función RPC no está disponible
   const fetchKitsFallback = async () => {
     try {
       const { data: kitsData, error } = await supabase
@@ -73,7 +72,6 @@ export default function Kits() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Lógica de Like con manejo de errores
   const handleToggleLike = async (kitId, isNowLiked) => {
     try {
       if (isNowLiked) {
@@ -83,12 +81,10 @@ export default function Kits() {
       }
     } catch (error) {
       console.error('Error toggling like:', error);
-      // Recargar kits en caso de error para sincronizar el estado
       fetchKits();
     }
   };
 
-  // Función para borrar kit (solo admin)
   const handleDeleteKit = async (kitId) => {
     if (!window.confirm("¿Seguro que quieres eliminar esta lista permanentemente?")) return;
     
@@ -96,12 +92,21 @@ export default function Kits() {
       const { error } = await supabase.from('kits').delete().eq('id', kitId);
       if (error) throw error;
       
-      // Actualizar UI localmente quitando el kit borrado
       setKits(prev => prev.filter(k => k.id !== kitId));
       toast.success("✅ Lista eliminada correctamente");
     } catch (err) {
       toast.error("⚠️ Error al borrar: " + err.message);
     }
+  };
+
+  const handleViewKit = (kit) => {
+    setSelectedKit(kit);
+    setShowKitModal(true);
+  };
+
+  const closeKitModal = () => {
+    setShowKitModal(false);
+    setSelectedKit(null);
   };
 
   return (
@@ -142,11 +147,97 @@ export default function Kits() {
                 currentUserId={anonId}
                 isAdmin={!!user}
                 onDelete={() => handleDeleteKit(kit.id)}
+                onViewKit={handleViewKit}
               />
             ))}
           </div>
         )}
       </div>
+
+      {/* Modal de Detalles del Kit */}
+      {showKitModal && selectedKit && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={closeKitModal}>
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800">{selectedKit.name}</h2>
+                <p className="text-slate-500 text-sm mt-1">Por {selectedKit.author_name || 'Anónimo'}</p>
+              </div>
+              <button 
+                onClick={closeKitModal}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                aria-label="Cerrar modal"
+              >
+                <X size={24} className="text-slate-400" />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm font-bold text-slate-500 uppercase mb-3">
+                Herramientas incluidas ({selectedKit.kit_items?.length || 0})
+              </p>
+              
+              {/* Lista de TODAS las herramientas */}
+              <div className="space-y-3">
+                {selectedKit.kit_items?.map((item, index) => (
+                  <div key={index} className="bg-slate-50 border border-slate-200 rounded-lg p-4 hover:bg-slate-100 transition-colors">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        {/* Nombre de la herramienta */}
+                        <h3 className="text-lg font-bold text-slate-800 mb-2">
+                          {item.tools?.name || 'Sin nombre'}
+                        </h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {/* Part Number */}
+                          <div>
+                            <p className="text-xs font-bold text-slate-500 uppercase mb-1">Part Number</p>
+                            <code className="text-sm font-mono text-blue-600 font-bold">
+                              {item.tools?.part_number || 'N/A'}
+                            </code>
+                          </div>
+                          
+                          {/* Categoría */}
+                          {item.tools?.category && (
+                            <div>
+                              <p className="text-xs font-bold text-slate-500 uppercase mb-1">Categoría</p>
+                              <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                                {item.tools.category}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Número de item */}
+                      <div className="flex-shrink-0">
+                        <span className="inline-flex items-center justify-center w-8 h-8 bg-slate-200 text-slate-600 rounded-full text-sm font-bold">
+                          {index + 1}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {(!selectedKit.kit_items || selectedKit.kit_items.length === 0) && (
+                  <div className="text-center py-8 text-slate-400">
+                    <p>Este kit no tiene herramientas</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end border-t border-slate-200 pt-4">
+              <button 
+                onClick={closeKitModal}
+                className="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
