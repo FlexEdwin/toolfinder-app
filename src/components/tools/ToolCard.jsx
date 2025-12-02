@@ -11,10 +11,10 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
 
   const getIcon = (category) => {
     const cat = category?.toLowerCase() || '';
-    if (cat.includes('eléctrico') || cat.includes('electric')) return <Zap size={20} />;
-    if (cat.includes('seguridad')) return <Shield size={20} />;
-    if (cat.includes('medición')) return <Ruler size={20} />;
-    return <Wrench size={20} />;
+    if (cat.includes('eléctrico') || cat.includes('electric')) return <Zap size={18} />;
+    if (cat.includes('seguridad')) return <Shield size={18} />;
+    if (cat.includes('medición')) return <Ruler size={18} />;
+    return <Wrench size={18} />;
   };
 
   const copyToClipboard = () => {
@@ -28,7 +28,7 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
       
       {/* Badge de Categoría */}
       <div className="absolute top-0 right-0">
-        <span className="inline-block px-3 py-1 text-[10px] font-bold rounded-bl-lg rounded-tr-lg uppercase tracking-wider bg-slate-100 text-slate-500 border-b border-l border-slate-200">
+        <span className="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-bl-lg rounded-tr-lg uppercase tracking-wider bg-slate-100 text-slate-500 border-b border-l border-slate-200">
           {tool.category}
         </span>
       </div>
@@ -42,10 +42,10 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
                 e.stopPropagation();
                 onEdit(tool);
               }}
-              className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors shadow-md"
+              className="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors shadow-sm"
               title="Editar herramienta"
             >
-              <Pencil size={14} />
+              <Pencil size={13} />
             </button>
           )}
           {onDelete && (
@@ -54,28 +54,28 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
                 e.stopPropagation();
                 onDelete(tool.id);
               }}
-              className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors shadow-md"
+              className="p-1.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors shadow-sm"
               title="Eliminar herramienta"
             >
-              <Trash2 size={14} />
+              <Trash2 size={13} />
             </button>
           )}
         </div>
       )}
 
-      <div className="p-5 flex-grow">
-        <div className="mb-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
+      <div className="p-4 flex-grow">
+        <div className="mb-2.5">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2.5 transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
             {getIcon(tool.category)}
           </div>
-          <h3 className="font-semibold text-slate-800 leading-tight text-lg">
+          <h3 className="font-semibold text-slate-800 leading-tight text-base">
             {tool.name}
           </h3>
         </div>
 
         {tool.specs && (
-           <div className="mb-4">
-             <span className="inline-flex items-center text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded border border-slate-200">
+           <div className="mb-3">
+             <span className="inline-flex items-center text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
                ⚙️ {typeof tool.specs === 'object' ? JSON.stringify(tool.specs) : tool.specs}
              </span>
            </div>
@@ -83,32 +83,32 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
 
         <div className="flex items-center gap-2 mt-auto">
           <span className="text-xs font-bold text-slate-400 uppercase">P/N:</span>
-          <code className="font-mono text-blue-700 font-bold text-lg select-all">
+          <code className="font-mono text-blue-700 font-bold text-base select-all">
             {tool.part_number}
           </code>
         </div>
       </div>
 
       {/* Footer de Acciones */}
-      <div className="p-3 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
+      <div className="p-2.5 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
         <button 
           onClick={copyToClipboard}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
         >
-          {copied ? '¡Copiado!' : <><Copy size={16} /> Copiar</>}
+          {copied ? '¡Copiado!' : <><Copy size={14} /> Copiar</>}
         </button>
 
         {/* BOTÓN MÁGICO DE SELECCIÓN */}
         <button 
           onClick={() => toggleTool(tool)}
-          className={`p-2 rounded-lg border transition-colors ${
+          className={`p-1.5 rounded-lg border transition-colors ${
             isSelected 
               ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
               : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100'
           }`}
           title={isSelected ? "Quitar de la lista" : "Agregar a lista"}
         >
-          {isSelected ? <Check size={20} /> : <FolderPlus size={20} />}
+          {isSelected ? <Check size={18} /> : <FolderPlus size={18} />}
         </button>
       </div>
     </div>

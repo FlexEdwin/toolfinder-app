@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Filter, Loader2, PlusCircle } from 'lucide-react';
+import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, FolderPlus, Check } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
 import { Link } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
@@ -15,9 +15,14 @@ import { useCategories } from '../hooks/useCategories';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
-  const { count } = useKit();
+  const { count, selectedTools, toggleTool } = useKit();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  
+  // View mode state with localStorage persistence
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('toolfinder_view_mode') || 'grid';
+  });
   
   // Local UI state
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,6 +34,11 @@ export default function Home() {
   const [editingTool, setEditingTool] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingToolId, setDeletingToolId] = useState(null);
+
+  // Persist view mode changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('toolfinder_view_mode', viewMode);
+  }, [viewMode]);
 
   // Dismiss keyboard on scroll
   useEffect(() => {
@@ -70,17 +80,14 @@ export default function Home() {
   const handleSaveTool = async (toolData) => {
     try {
       if (editingTool) {
-        // UPDATE
         const { error } = await supabase
           .from('tools')
           .update(toolData)
           .eq('id', editingTool.id);
 
         if (error) throw error;
-
         toast.success("✅ Herramienta actualizada");
       } else {
-        // CREATE
         const { data, error } = await supabase
           .from('tools')
           .insert([toolData])
@@ -88,18 +95,14 @@ export default function Home() {
           .single();
 
         if (error) throw error;
-
         toast.success("✅ Herramienta creada con éxito");
         
-        // Invalidate categories if new category was added
         if (toolData.category && !categoriesData.includes(toolData.category)) {
           queryClient.invalidateQueries({ queryKey: ['categories'] });
         }
       }
 
-      // Invalidate tools query to refetch
       queryClient.invalidateQueries({ queryKey: ['tools'] });
-
       setShowToolModal(false);
       setEditingTool(null);
     } catch (error) {
@@ -109,7 +112,7 @@ export default function Home() {
       } else {
         toast.error("⚠️ Error al guardar: " + error.message);
       }
-      throw error; // Re-throw to keep modal open
+      throw error;
     }
   };
 
@@ -135,7 +138,6 @@ export default function Home() {
       toast.success("✅ Herramienta eliminada");
       setShowDeleteConfirm(false);
       
-      // Invalidate queries to refetch
       queryClient.invalidateQueries({ queryKey: ['tools'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     } catch (error) {
@@ -143,19 +145,101 @@ export default function Home() {
     }
   };
 
+  // List view row component
+  const ToolListRow = ({ tool, isAdmin, onEdit, onDelete }) => {
+    const [copied, setCopied] = useState(false);
+    const isSelected = selectedTools.some(t => t.id === tool.id);
+
+    const copyToClipboard = () => {
+      navigator.clipboard.writeText(tool.part_number);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+
+    const getIcon = (category) => {
+      const cat = category?.toLowerCase() || '';
+      if (cat.includes('eléctrico') || cat.includes('electric')) return '⚡';
+      if (cat.includes('seguridad')) return '🛡️';
+      if (cat.includes('medición')) return '📏';
+      return '🔧';
+    };
+
+    return (
+      <div className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-all hover:shadow-md ${
+        isSelected ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'
+      }`}>
+        {/* Icon + Name */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <span className="text-2xl flex-shrink-0">{getIcon(tool.category)}</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-slate-800 truncate text-sm">{tool.name}</h3>
+            <span className="text-xs text-slate-500">{tool.category}</span>
+          </div>
+        </div>
+
+        {/* Part Number */}
+        <code className="font-mono text-blue-700 font-bold text-sm flex-shrink-0 hidden sm:block">
+          {tool.part_number}
+        </code>
+
+        {/* Actions */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {isAdmin && (
+            <>
+              <button
+                onClick={() => onEdit(tool)}
+                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                title="Editar"
+              >
+                <PlusCircle size={14} />
+              </button>
+              <button
+                onClick={() => onDelete(tool.id)}
+                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                title="Eliminar"
+              >
+                <Filter size={14} />
+              </button>
+            </>
+          )}
+          
+          <button
+            onClick={copyToClipboard}
+            className={`p-1.5 rounded transition-colors ${
+              copied ? 'bg-green-50 text-green-600' : 'hover:bg-slate-100 text-slate-600'
+            }`}
+            title="Copiar P/N"
+          >
+            <Copy size={14} />
+          </button>
+
+          <button
+            onClick={() => toggleTool(tool)}
+            className={`p-1.5 rounded transition-colors ${
+              isSelected 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+            }`}
+            title={isSelected ? "Quitar" : "Agregar"}
+          >
+            {isSelected ? <Check size={16} /> : <FolderPlus size={16} />}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       
-      {/* --- SECCIÓN SUPERIOR OSCURA (Estilo Dashboard) --- */}
+      {/* SECCIÓN SUPERIOR */}
       <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm pt-6 pb-6 px-4 shadow-md transition-all">
         <div className="max-w-6xl mx-auto space-y-6">
           
-          {/* Título + Buscador */}
           <div className="max-w-3xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-white text-2xl font-bold">Catálogo Maestro</h2>
               
-              {/* Botones Admin */}
               {user && (
                 <div className="flex gap-2">
                   <button
@@ -194,9 +278,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Filtros de Categoría (Pill Shapes) */}
+          {/* Filtros de Categoría */}
           <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            {/* Botón "Todas" fijo */}
             <button
               onClick={() => setSelectedCategory("Todas")}
               className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
@@ -208,7 +291,6 @@ export default function Home() {
               Todas
             </button>
             
-            {/* Categorías dinámicas */}
             {loadingCats ? (
               <span className="text-slate-400 text-sm px-4 py-1.5">Cargando filtros...</span>
             ) : (
@@ -230,7 +312,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* --- RESULTADOS (GRILLA) --- */}
+      {/* RESULTADOS */}
       <div className="max-w-6xl mx-auto px-4">
         {isLoading ? (
           <div className="flex justify-center py-20">
@@ -244,6 +326,7 @@ export default function Home() {
           </div>
         ) : (
           <>
+            {/* Results counter + View toggle */}
             <div className="flex justify-between items-center mb-6 px-1">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
@@ -269,19 +352,60 @@ export default function Home() {
                   </button>
                 )}
               </div>
+
+              {/* View Toggle Buttons */}
+              <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded transition-all ${
+                    viewMode === 'grid' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                  title="Vista de Grilla"
+                >
+                  <LayoutGrid size={18} />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded transition-all ${
+                    viewMode === 'list' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                  title="Vista de Lista"
+                >
+                  <List size={18} />
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allTools.map(tool => (
-                <ToolCard 
-                  key={tool.id} 
-                  tool={tool}
-                  isAdmin={!!user}
-                  onEdit={handleEditTool}
-                  onDelete={handleDeleteTool}
-                />
-              ))}
-            </div>
+            {/* Conditional rendering based on view mode */}
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {allTools.map(tool => (
+                  <ToolCard 
+                    key={tool.id} 
+                    tool={tool}
+                    isAdmin={!!user}
+                    onEdit={handleEditTool}
+                    onDelete={handleDeleteTool}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {allTools.map(tool => (
+                  <ToolListRow
+                    key={tool.id}
+                    tool={tool}
+                    isAdmin={!!user}
+                    onEdit={handleEditTool}
+                    onDelete={handleDeleteTool}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Load More Button */}
             {hasNextPage && (
@@ -319,7 +443,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* --- BARRA FLOTANTE DE CREACIÓN DE KIT --- */}
+      {/* BARRA FLOTANTE DE CREACIÓN DE KIT */}
       {count > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-4 z-40 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <div className="max-w-xl mx-auto bg-slate-900 text-white rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-slate-700">
