@@ -57,7 +57,7 @@ export default function SystemAnnouncement() {
         <div className="flex justify-end mb-6">
           <div className="text-right border-r-4 border-slate-200 pr-4">
             <p className="text-slate-800 font-bold text-lg leading-none mb-1">
-              Flex
+              <span translate="no" className="notranslate">Flex</span>
             </p>
             <p className="text-slate-500 text-sm font-serif italic">
               Lead Developer

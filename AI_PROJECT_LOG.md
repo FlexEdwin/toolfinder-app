@@ -181,15 +181,23 @@ Eliminar la categoría genérica "General" y clasificar automáticamente las 2.7
 - Validar visualmente en el Frontend que los botones de categoría se rendericen bien (Sticky Header).
 - Continuar con la mejora visual de las tarjetas (Smart Cards).
 
-### [02/12/2025] - MEJORA DE UX: DISMISS KEYBOARD ON SCROLL
+### [02/12/2025] - MEJORAS DE UX MÓVIL Y BRANDING
 
 **Objetivo:**
-Mejorar la experiencia en móviles evitando que el teclado cubra los resultados al hacer scroll.
+Refinar la experiencia de uso en dispositivos móviles y proteger la identidad de marca contra traducciones automáticas.
 
-**Cambios en `src/pages/Home.jsx`:**
+**Cambios Realizados:**
 
-- **Listener de Scroll:** Implementado `useEffect` que escucha eventos `scroll` y `touchmove`.
-- **Lógica de Blur:** Detecta si el foco está en un `INPUT` y fuerza `blur()` al detectar movimiento.
+1.  **Dismiss Keyboard on Scroll (`Home.jsx`):**
 
-**Resultado:**
-✅ El teclado se cierra automáticamente al explorar los resultados, liberando espacio en pantalla.
+    - Implementado listener dual (`scroll` + `touchmove`).
+    - Lógica inteligente: Solo hace `blur()` si el elemento activo es un INPUT.
+    - **Resultado:** El teclado se oculta naturalmente al explorar, ampliando el área visible.
+
+2.  **Protección de Marca (`SystemAnnouncement.jsx`):**
+    - Aplicado atributo `translate="no"` y clase `notranslate` al nombre "Flex".
+    - **Resultado:** Evita que Google Translate cambie "Flex" por "Doblar" o "Flexionar", manteniendo la firma profesional.
+
+**Estado:**
+✅ UX Móvil significativamente más fluida.
+✅ Identidad visual protegida.
