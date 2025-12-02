@@ -180,3 +180,16 @@ Eliminar la categoría genérica "General" y clasificar automáticamente las 2.7
 
 - Validar visualmente en el Frontend que los botones de categoría se rendericen bien (Sticky Header).
 - Continuar con la mejora visual de las tarjetas (Smart Cards).
+
+### [02/12/2025] - MEJORA DE UX: DISMISS KEYBOARD ON SCROLL
+
+**Objetivo:**
+Mejorar la experiencia en móviles evitando que el teclado cubra los resultados al hacer scroll.
+
+**Cambios en `src/pages/Home.jsx`:**
+
+- **Listener de Scroll:** Implementado `useEffect` que escucha eventos `scroll` y `touchmove`.
+- **Lógica de Blur:** Detecta si el foco está en un `INPUT` y fuerza `blur()` al detectar movimiento.
+
+**Resultado:**
+✅ El teclado se cierra automáticamente al explorar los resultados, liberando espacio en pantalla.

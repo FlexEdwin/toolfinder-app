@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Search, Filter, Loader2, PlusCircle } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
@@ -29,6 +29,23 @@ export default function Home() {
   const [editingTool, setEditingTool] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingToolId, setDeletingToolId] = useState(null);
+
+  // Dismiss keyboard on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (document.activeElement.tagName === 'INPUT') {
+        document.activeElement.blur();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('touchmove', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchmove', handleScroll);
+    };
+  }, []);
 
   // React Query hooks
   const { 
