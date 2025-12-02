@@ -149,3 +149,34 @@ Mejorar la usabilidad manteniendo el buscador y los filtros siempre visibles al 
 
 **Resultado:**
 ✅ Navegación más fluida y acceso constante a las herramientas de búsqueda.
+
+### [02/12/2025] - REESTRUCTURACIÓN MASIVA DE BASE DE DATOS
+
+**Objetivo:**
+Eliminar la categoría genérica "General" y clasificar automáticamente las 2.700 herramientas usando patrones de nombres (Keywords).
+
+**Acciones en Backend (SQL):**
+
+- Ejecutado script de clasificación masiva basado en palabras clave (Inglés/Español).
+- Creada taxonomía de 10 Super-Categorías estándar de aviación:
+  1. Medición y Pruebas (Multímetros, Torques)
+  2. Herramientas Especiales (Pines, Extractores)
+  3. Herramientas Manuales (Llaves, Copas)
+  4. GSE y Carga (Gatos, Eslingas)
+  5. Fluidos y Neumática
+  6. Kits y Contenedores
+  7. Herramientas de Potencia
+  8. Aviónica y Tecnología
+  9. Acceso y Seguridad
+  10. Consumibles
+
+**Resultado:**
+
+- ✅ **77% de la DB clasificada automáticamente.**
+- Reducción de "General" de 2.700 items a ~640.
+- UX inmediata: Ahora los filtros de categoría en el Home serán realmente útiles.
+
+**Próximos Pasos:**
+
+- Validar visualmente en el Frontend que los botones de categoría se rendericen bien (Sticky Header).
+- Continuar con la mejora visual de las tarjetas (Smart Cards).
