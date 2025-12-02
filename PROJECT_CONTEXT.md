@@ -1,37 +1,33 @@
-PROJECT CONTEXT: ToolFinder App
+# PROJECT CONTEXT: ToolFinder App
 
-1. Resumen del Proyecto
-   Aplicación web para la gestión y búsqueda inteligente de herramientas en almacenes técnicos.
-   Objetivo: Permitir a operarios encontrar herramientas por nombre, descripción, P/N o sinónimos (en inglés/español) rápidamente, incluso con mala conexión, y agruparlas en "Kits".
-2. Stack Tecnológico
-   Frontend: React 19 + Vite (SPA).
-   Estilos: TailwindCSS + Lucide Icons + Sonner (Toasts).
-   Backend/DB: Supabase (PostgreSQL + Auth + Storage).
-   State Management: [En transición a TanStack Query] (Actualmente useState/Context).
-   Deploy: Cloudflare Pages / GitHub Actions.
-3. Base de Datos (Schema Actual)
-   Tabla: tools
-   id (uuid, PK)
-   name (text): Nombre común (ej: "Taladro Percutor").
-   part_number (text): Código único (ej: "DWD520").
-   description (text): Detalles técnicos.
-   category (text): Agrupación (ej: "Power Tools").
-   keywords (text): Palabras clave para búsqueda (ej: "drill, agujerear").
-   image (text): URL de la imagen (opcional).
-   Pendiente: Implementación de índices FTS y Trigramas.
-   Tabla: kits
-   id (uuid, PK)
-   name (text): Nombre del kit (ej: "Kit Cambio de Rueda").
-   author_name (text): Creador.
-   created_at (timestamp).
-   Tabla: kit_items
-   kit_id (FK -> kits.id)
-   tool_id (FK -> tools.id)
-4. Reglas de Negocio Clave
-   Read-Only para Operarios: Cualquiera puede buscar y ver herramientas.
-   Admin Only: Solo el administrador puede crear/editar/borrar herramientas (Tabla tools).
-   Kits Públicos: Los usuarios pueden crear Kits para agrupar herramientas y compartirlos.
-   Búsqueda Robusta: Debe tolerar errores ortográficos ("vaccum" vs "vacuum") y buscar en múltiples campos a la vez.
-5. Estado Actual del Código (Snapshot)
-   Fetching: Actualmente se hace en Home.jsx mediante un useEffect que llama a un RPC search_tools_partial o filtra un array en memoria.
-   Problema actual: Se carga gran parte de la DB al inicio. Estamos migrando a búsqueda 100% server-side.
+## 1. Resumen Técnico
+
+Aplicación React + Supabase para búsqueda de herramientas.
+**Estado:** FASE 1 COMPLETADA. Arquitectura Server-Side consolidada.
+**Arquitectura:** React 19 + Vite + TanStack Query v5 + Supabase RPCs.
+
+## 2. Base de Datos (Supabase)
+
+- **Búsqueda:** RPC `search_tools_smart` (FTS + Trigram + Tolerancia a Typos).
+- **Categorías:** RPC `get_distinct_categories`.
+- **Índices:** `idx_tools_search_fuzzy` (GIN).
+
+## 3. Frontend (React)
+
+- **Data Fetching:** `useInfiniteQuery` (React Query) para paginación manual.
+- **Hooks:**
+  - `useTools.js`: Gestiona búsqueda y paginación infinita (flattening de páginas).
+  - `useCategories.js`: Carga categorías.
+- **Flujo de Datos:** Directo DB -> UI. **Prohibido** usar `.filter()` en cliente para búsqueda.
+
+## 4. UI/UX Actual
+
+- **Home:** Barra de búsqueda, Filtros de Categoría, Lista de Tarjetas, Botón "Cargar más".
+- **Kits:** Creación y visualización de listas de herramientas.
+- **Feedback:** Skeletons de carga, Spinners, Toasts (Sonner).
+
+## 5. PRÓXIMOS PASOS (FASE 2: UX MOBILE)
+
+1. **Sticky Header:** La barra de búsqueda desaparece al hacer scroll. Debe ser fija en móviles.
+2. **Visual Hierarchy:** Mejorar el diseño de la tarjeta para que el Part Number sea el protagonista.
+3. **Kit Floating Action:** Facilitar el acceso al "Carrito/Kit" mientras se explora.
