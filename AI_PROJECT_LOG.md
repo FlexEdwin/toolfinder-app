@@ -134,3 +134,18 @@ Paginación infinita manual (sin scroll automático) usando `useInfiniteQuery` d
 ✅ **Feedback Visual:** Spinner y estado deshabilitado durante la carga de nuevas páginas.
 
 ---
+
+### [02/12/2025] - MEJORA DE UI: STICKY HEADER
+
+**Objetivo:**
+Mejorar la usabilidad manteniendo el buscador y los filtros siempre visibles al hacer scroll.
+
+**Cambios en `src/pages/Home.jsx`:**
+
+- **Sticky Header:** Se aplicó `sticky top-0 z-10` al contenedor principal del encabezado.
+- **Estilo Visual:** Fondo semitransparente `bg-slate-900/95` con `backdrop-blur-sm` para efecto moderno.
+- **Ajuste de Espaciado:** Reducido el padding inferior (`pb-12` -> `pb-6`) y eliminado el margen negativo del grid de resultados para evitar solapamientos visuales.
+- **Sombra:** Suavizada a `shadow-md` para separar sutilmente el header del contenido.
+
+**Resultado:**
+✅ Navegación más fluida y acceso constante a las herramientas de búsqueda.

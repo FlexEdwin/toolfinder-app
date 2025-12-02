@@ -130,7 +130,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 pb-20">
       
       {/* --- SECCIÓN SUPERIOR OSCURA (Estilo Dashboard) --- */}
-      <div className="bg-slate-900 pt-6 pb-12 px-4 shadow-lg">
+      <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm pt-6 pb-6 px-4 shadow-md transition-all">
         <div className="max-w-6xl mx-auto space-y-6">
           
           {/* Título + Buscador */}
@@ -214,7 +214,7 @@ export default function Home() {
       </div>
 
       {/* --- RESULTADOS (GRILLA) --- */}
-      <div className="max-w-6xl mx-auto px-4 -mt-6">
+      <div className="max-w-6xl mx-auto px-4">
         {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-blue-600" size={40} />
