@@ -101,8 +101,36 @@ Garantizar que la data fluya DIRECTAMENTE desde el RPC `search_tools_smart` hast
 
 ---
 
-## PRÓXIMOS PASOS (ROADMAP INMEDIATO)
+### [02/12/2025] - IMPLEMENTACIÓN DE PAGINACIÓN INFINITA MANUAL
 
-1. **UX de Paginación:** Implementar "Infinite Scroll" o botón "Cargar más" en `Home.jsx` (Actualmente limitado a 20 items).
-2. ~~**Limpieza Final:** Eliminar cualquier filtrado residual en Javascript (`.filter`) para confiar 100% en el SQL.~~ ✅ **COMPLETADO**
-3. **Visualización:** Mejorar el diseño de la tarjeta de herramienta para destacar el Part Number.
+**Objetivo:**
+Eliminar el límite de 20 herramientas permitiendo cargar más resultados bajo demanda con un botón "Cargar más".
+
+**Estrategia:**
+Paginación infinita manual (sin scroll automático) usando `useInfiniteQuery` de React Query.
+
+**Archivos Modificados:**
+
+1. **`src/hooks/useTools.js`:**
+
+   - ✅ Migrado de `useQuery` → `useInfiniteQuery`
+   - ✅ Implementado `initialPageParam: 1`
+   - ✅ Implementado `getNextPageParam`: Retorna `undefined` si la última página tiene < 20 items (fin de resultados)
+   - ✅ Eliminado parámetro `page` del hook (ahora manejado internamente por React Query)
+
+2. **`src/pages/Home.jsx`:**
+   - ✅ Actualizado destructuring: `data`, `fetchNextPage`, `hasNextPage`, `isFetchingNextPage`
+   - ✅ Creada variable `allTools = data?.pages.flat() || []` para aplanar las páginas
+   - ✅ Reemplazadas todas las referencias `tools` → `allTools`
+   - ✅ Agregado botón "Cargar más herramientas...":
+     - Centrado y ancho
+     - Solo visible si `hasNextPage === true`
+     - Deshabilitado con spinner mientras carga (`isFetchingNextPage`)
+     - Ejecuta `fetchNextPage()` al hacer clic
+
+**Resultado:**
+✅ **UX Mejorada:** Los usuarios pueden explorar todo el catálogo sin límites artificiales.
+✅ **Performance Optimizada:** Solo se cargan 20 items a la vez, reduciendo carga inicial.
+✅ **Feedback Visual:** Spinner y estado deshabilitado durante la carga de nuevas páginas.
+
+---

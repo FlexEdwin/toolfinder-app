@@ -31,13 +31,23 @@ export default function Home() {
   const [deletingToolId, setDeletingToolId] = useState(null);
 
   // React Query hooks
-  const { data: tools = [], isLoading, isError, error } = useTools({
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage 
+  } = useTools({
     search: searchTerm,
     category: selectedCategory,
-    page: 1,
   });
 
   const { data: categoriesData = [], isLoading: loadingCats } = useCategories();
+
+  // Flatten pages into a single array of tools
+  const allTools = data?.pages.flat() || [];
 
   // CRUD Functions
   const handleSaveTool = async (toolData) => {
@@ -220,19 +230,15 @@ export default function Home() {
             <div className="flex justify-between items-center mb-6 px-1">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
-                  {!searchTerm && selectedCategory === "Todas" ? (
+                  {!searchTerm && selectedCategory === "Todas" && allTools.length === 20 ? (
                     <span className="text-blue-900 font-bold text-sm sm:text-base">
                       Explorando Catálogo Maestro (+2,700 herramientas)
                     </span>
-                  ) : tools.length === 20 ? (
-                    <span className="text-blue-900 font-bold text-sm sm:text-base">
-                      Mostrando las primeras 20 coincidencias...
-                    </span>
                   ) : (
                     <>
-                      <span className="text-blue-900 font-bold text-lg">{tools.length}</span>
+                      <span className="text-blue-900 font-bold text-lg">{allTools.length}</span>
                       <span className="text-blue-600 text-sm ml-2">
-                        {tools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
+                        {allTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
                       </span>
                     </>
                   )}
@@ -249,7 +255,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tools.map(tool => (
+              {allTools.map(tool => (
                 <ToolCard 
                   key={tool.id} 
                   tool={tool}
@@ -260,7 +266,27 @@ export default function Home() {
               ))}
             </div>
 
-            {tools.length === 0 && (
+            {/* Load More Button */}
+            {hasNextPage && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-3 rounded-lg font-bold text-base transition-all shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center gap-3"
+                >
+                  {isFetchingNextPage ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      Cargando...
+                    </>
+                  ) : (
+                    'Cargar más herramientas...'
+                  )}
+                </button>
+              </div>
+            )}
+
+            {allTools.length === 0 && (
               <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
                 <Filter className="mx-auto text-slate-300 mb-2" size={48} />
                 <p className="text-slate-500">No encontramos herramientas con ese criterio.</p>
