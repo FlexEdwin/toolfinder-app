@@ -39,19 +39,6 @@ export default function Home() {
 
   const { data: categoriesData = [], isLoading: loadingCats } = useCategories();
 
-  // Filter tools locally for now (until RPC is ready)
-  const filteredTools = tools.filter(tool => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      tool.name?.toLowerCase().includes(searchLower) || 
-      tool.part_number?.toLowerCase().includes(searchLower) ||
-      tool.keywords?.toLowerCase().includes(searchLower);
-    
-    const matchesCategory = selectedCategory === "Todas" || tool.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
-
   // CRUD Functions
   const handleSaveTool = async (toolData) => {
     try {
@@ -237,15 +224,15 @@ export default function Home() {
                     <span className="text-blue-900 font-bold text-sm sm:text-base">
                       Explorando Catálogo Maestro (+2,700 herramientas)
                     </span>
-                  ) : filteredTools.length === 20 ? (
+                  ) : tools.length === 20 ? (
                     <span className="text-blue-900 font-bold text-sm sm:text-base">
                       Mostrando las primeras 20 coincidencias...
                     </span>
                   ) : (
                     <>
-                      <span className="text-blue-900 font-bold text-lg">{filteredTools.length}</span>
+                      <span className="text-blue-900 font-bold text-lg">{tools.length}</span>
                       <span className="text-blue-600 text-sm ml-2">
-                        {filteredTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
+                        {tools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
                       </span>
                     </>
                   )}
@@ -262,7 +249,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTools.map(tool => (
+              {tools.map(tool => (
                 <ToolCard 
                   key={tool.id} 
                   tool={tool}
@@ -273,7 +260,7 @@ export default function Home() {
               ))}
             </div>
 
-            {filteredTools.length === 0 && (
+            {tools.length === 0 && (
               <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
                 <Filter className="mx-auto text-slate-300 mb-2" size={48} />
                 <p className="text-slate-500">No encontramos herramientas con ese criterio.</p>

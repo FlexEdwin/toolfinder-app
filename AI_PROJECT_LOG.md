@@ -66,8 +66,43 @@ Implementada lógica condicional para el texto del contador:
 
 ---
 
+### [02/12/2025] - AUDITORÍA Y LIMPIEZA DE FILTRADO FRONTEND
+
+**Objetivo Crítico:**
+Garantizar que la data fluya DIRECTAMENTE desde el RPC `search_tools_smart` hasta la UI sin manipulación en el cliente.
+
+**Problema Detectado:**
+
+- `Home.jsx` contenía una función `.filter()` (líneas 42-53) que RE-FILTRABA los resultados ya procesados por Supabase.
+- Esto anulaba completamente la lógica de búsqueda inteligente del backend (tolerancia a typos, similitud difusa, etc.).
+
+**Archivos Auditados:**
+
+1. **`src/hooks/useTools.js`:**
+
+   - ✅ **LIMPIO** - Los parámetros `search` y `category` se pasan correctamente al RPC.
+   - ✅ Retorna la data cruda sin transformaciones.
+
+2. **`src/pages/Home.jsx`:**
+   - ❌ **CONTAMINADO** - Filtrado local detectado y eliminado.
+   - ✅ **CORREGIDO** - Todas las referencias a `filteredTools` reemplazadas por `tools`.
+
+**Cambios Realizados:**
+
+- **Eliminado:** Bloque completo de filtrado local (13 líneas de código ilegal).
+- **Reemplazado:** 4 referencias a `filteredTools` → `tools` en el JSX:
+  - Contador de resultados (línea 240, 246)
+  - Renderizado de tarjetas (línea 265)
+  - Mensaje de "sin resultados" (línea 276)
+
+**Resultado:**
+✅ **Data Flow Puro:** Supabase RPC → React Query → UI (sin intermediarios).
+✅ **Búsqueda Inteligente Activa:** Si el RPC dice que "Vaccum" coincide con "vacc", el frontend lo muestra sin cuestionar.
+
+---
+
 ## PRÓXIMOS PASOS (ROADMAP INMEDIATO)
 
 1. **UX de Paginación:** Implementar "Infinite Scroll" o botón "Cargar más" en `Home.jsx` (Actualmente limitado a 20 items).
-2. **Limpieza Final:** Eliminar cualquier filtrado residual en Javascript (`.filter`) para confiar 100% en el SQL.
+2. ~~**Limpieza Final:** Eliminar cualquier filtrado residual en Javascript (`.filter`) para confiar 100% en el SQL.~~ ✅ **COMPLETADO**
 3. **Visualización:** Mejorar el diseño de la tarjeta de herramienta para destacar el Part Number.
