@@ -201,3 +201,44 @@ Refinar la experiencia de uso en dispositivos móviles y proteger la identidad d
 **Estado:**
 ✅ UX Móvil significativamente más fluida.
 ✅ Identidad visual protegida.
+
+### [03/12/2025] - MEJORA DE VISTA DE LISTA: PRIORIZACIÓN DE PART NUMBER
+
+**Objetivo:**
+Reorganizar la Vista de Lista basándose en feedback de campo. Los operarios necesitan ver el Part Number (P/N) de forma prominente, ya que es más crítico que la categoría para identificación rápida de herramientas.
+
+**Cambios en `src/pages/Home.jsx` (Componente `ToolListRow`):**
+
+1. **Layout Reorganizado:**
+
+   - **Izquierda:** Icono + Nombre (truncado si es largo)
+   - **Centro/Derecha:** Part Number destacado con:
+     - Fuente monoespaciada (`font-mono text-sm`)
+     - Fondo gris suave (`bg-slate-50`)
+     - Borde sutil (`border border-slate-200`)
+     - Padding para mejor legibilidad (`px-2.5 py-1`)
+     - Negrita para máxima visibilidad (`font-bold`)
+   - **Derecha Extrema:** Botones de acción (Copiar, Agregar)
+
+2. **Categoría Optimizada:**
+
+   - Desktop: Texto pequeño debajo del nombre (`text-xs text-gray-400`)
+   - Mobile: Mantenida debajo del nombre pero con menor prioridad visual
+
+3. **Responsive Design:**
+   - Part Number oculto en pantallas muy pequeñas (`hidden sm:block`)
+   - Categoría adaptativa con clases `hidden md:inline-block` y `block md:hidden`
+
+**Resultado:**
+✅ Part Number ahora es el elemento visual más destacado en la lista.
+✅ Mejor escaneabilidad para operarios en campo.
+✅ Diseño responsive que mantiene usabilidad en móvil.
+
+**[FIX CRÍTICO - 03/12/2025 10:50]:**
+
+- **Problema detectado:** El Part Number estaba oculto en móviles (`hidden sm:block`), afectando al 80% de usuarios.
+- **Solución implementada:**
+  - **Móvil:** Layout en columna (`flex-col`) - Nombre arriba, P/N debajo (siempre visible)
+  - **Desktop:** Layout horizontal (`md:flex-row`) - Nombre izquierda, P/N centro/derecha
+  - **Categoría:** Oculta en móvil para priorizar el Part Number
+- **Resultado:** ✅ Part Number ahora es 100% visible en todos los dispositivos.

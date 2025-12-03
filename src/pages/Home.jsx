@@ -168,21 +168,31 @@ export default function Home() {
       <div className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-all hover:shadow-md ${
         isSelected ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'
       }`}>
-        {/* Icon + Name */}
+        {/* Left: Icon + Content (responsive layout) */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="text-2xl flex-shrink-0">{getIcon(tool.category)}</span>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-slate-800 truncate text-sm">{tool.name}</h3>
-            <span className="text-xs text-slate-500">{tool.category}</span>
+          
+          {/* Content container - changes from column (mobile) to row (desktop) */}
+          <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:gap-4">
+            {/* Name + Category */}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-slate-800 truncate text-sm">{tool.name}</h3>
+              {/* Category - only visible on desktop */}
+              <span className="hidden md:inline-block text-xs text-gray-400">{tool.category}</span>
+            </div>
+            
+            {/* Part Number - ALWAYS VISIBLE */}
+            <div className="mt-1 md:mt-0 flex-shrink-0">
+              <code className="font-mono text-sm font-bold text-blue-700 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+                {tool.part_number}
+              </code>
+            </div>
           </div>
         </div>
 
-        {/* Part Number */}
-        <code className="font-mono text-blue-700 font-bold text-sm flex-shrink-0 hidden sm:block">
-          {tool.part_number}
-        </code>
 
-        {/* Actions */}
+
+        {/* Right: Action Buttons */}
         <div className="flex items-center gap-1 flex-shrink-0">
           {isAdmin && (
             <>
