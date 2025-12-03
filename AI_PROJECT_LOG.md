@@ -242,3 +242,36 @@ Reorganizar la Vista de Lista basándose en feedback de campo. Los operarios nec
   - **Desktop:** Layout horizontal (`md:flex-row`) - Nombre izquierda, P/N centro/derecha
   - **Categoría:** Oculta en móvil para priorizar el Part Number
 - **Resultado:** ✅ Part Number ahora es 100% visible en todos los dispositivos.
+
+### [03/12/2025] - CONTADOR PRECISO DE HERRAMIENTAS
+
+**Objetivo:**
+Mostrar el total real de herramientas en la base de datos, no solo los items cargados en la página actual.
+
+**Problema:**
+El contador mostraba `allTools.length` (20 items cargados), no el total real que coincide con los filtros activos.
+
+**Solución Implementada:**
+
+1. **Backend (Supabase):**
+
+   - Creado RPC `count_tools_smart` que replica la lógica de búsqueda de `search_tools_smart`
+   - Retorna el COUNT total de herramientas que coinciden con `search_term` y `category_filter`
+   - Usa los mismos criterios: ILIKE + similarity con threshold 0.3
+
+2. **Frontend:**
+   - **Nuevo Hook:** `src/hooks/useToolCount.js`
+     - Usa `useQuery` de React Query
+     - `staleTime: 60 segundos` (los conteos no necesitan ser en tiempo real)
+     - Acepta parámetros `search` y `category`
+   - **Integración en `Home.jsx`:**
+     - Importado y usado el hook `useToolCount`
+     - Actualizada lógica del badge azul:
+       - **Sin búsqueda:** "Explorando [Categoría] (X herramientas)"
+       - **Con búsqueda:** "X resultados encontrados"
+     - Agregado estado de carga: "Contando..." mientras se obtiene el total
+
+**Resultado:**
+✅ El contador ahora muestra el total real de la base de datos.
+✅ Los usuarios ven cuántos resultados existen, no solo cuántos están cargados.
+✅ Performance optimizada con caché de 1 minuto.

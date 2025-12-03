@@ -12,6 +12,7 @@ import CategoryManagerModal from '../components/tools/CategoryManagerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useTools } from '../hooks/useTools';
 import { useCategories } from '../hooks/useCategories';
+import { useToolCount } from '../hooks/useToolCount';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
@@ -72,6 +73,12 @@ export default function Home() {
   });
 
   const { data: categoriesData = [], isLoading: loadingCats } = useCategories();
+
+  // Get total count from database
+  const { data: totalCount = 0, isLoading: loadingCount } = useToolCount({
+    search: searchTerm,
+    category: selectedCategory,
+  });
 
   // Flatten pages into a single array of tools
   const allTools = data?.pages.flat() || [];
@@ -340,15 +347,17 @@ export default function Home() {
             <div className="flex justify-between items-center mb-6 px-1">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
-                  {!searchTerm && selectedCategory === "Todas" && allTools.length === 20 ? (
+                  {loadingCount ? (
+                    <span className="text-blue-600 text-sm">Contando...</span>
+                  ) : !searchTerm ? (
                     <span className="text-blue-900 font-bold text-sm sm:text-base">
-                      Explorando Catálogo Maestro (+2,700 herramientas)
+                      Explorando {selectedCategory === "Todas" ? "Catálogo Maestro" : selectedCategory} ({totalCount.toLocaleString()} herramientas)
                     </span>
                   ) : (
                     <>
-                      <span className="text-blue-900 font-bold text-lg">{allTools.length}</span>
+                      <span className="text-blue-900 font-bold text-lg">{totalCount.toLocaleString()}</span>
                       <span className="text-blue-600 text-sm ml-2">
-                        {allTools.length === 1 ? 'herramienta encontrada' : 'herramientas encontradas'}
+                        {totalCount === 1 ? 'resultado encontrado' : 'resultados encontrados'}
                       </span>
                     </>
                   )}
