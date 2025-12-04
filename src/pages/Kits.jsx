@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, TrendingUp, AlertCircle, X } from 'lucide-react';
+import { Loader2, TrendingUp, AlertCircle, X, Copy, Share2 } from 'lucide-react';
 import KitCard from '../components/social/KitCard';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
@@ -109,6 +109,33 @@ export default function Kits() {
     setSelectedKit(null);
   };
 
+  // Generate clean text for sharing
+  const generateKitText = (kit) => {
+    if (!kit) return '';
+    
+    let text = `📋 ${kit.name}\n\n`;
+    
+    kit.kit_items?.forEach((item) => {
+      const pn = item.tools?.part_number || 'N/A';
+      const name = item.tools?.name || 'Sin nombre';
+      text += `${pn} ${name}\n`;
+    });
+    
+    return text;
+  };
+
+  const handleCopyKit = () => {
+    const text = generateKitText(selectedKit);
+    navigator.clipboard.writeText(text);
+    toast.success('✅ Lista copiada al portapapeles');
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = generateKitText(selectedKit);
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       
@@ -172,7 +199,8 @@ export default function Kits() {
               </button>
             </div>
             
-            <div className="mb-4">
+            {/* Contenedor con padding-bottom para el action bar */}
+            <div className="mb-4 pb-24">
               <p className="text-sm font-bold text-slate-500 uppercase mb-3">
                 Herramientas incluidas ({selectedKit.kit_items?.length || 0})
               </p>
@@ -227,10 +255,29 @@ export default function Kits() {
               </div>
             </div>
             
-            <div className="mt-6 flex justify-end border-t border-slate-200 pt-4">
+            {/* Sticky Action Bar */}
+            <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 p-4 flex items-center justify-between gap-3">
+              <div className="flex gap-2">
+                <button 
+                  onClick={handleCopyKit}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-sm"
+                >
+                  <Copy size={16} />
+                  Copiar
+                </button>
+                
+                <button 
+                  onClick={handleShareWhatsApp}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm"
+                >
+                  <Share2 size={16} />
+                  WhatsApp
+                </button>
+              </div>
+              
               <button 
                 onClick={closeKitModal}
-                className="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors font-medium"
               >
                 Cerrar
               </button>

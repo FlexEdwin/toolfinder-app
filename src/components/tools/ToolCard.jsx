@@ -1,4 +1,4 @@
-import { Copy, FolderPlus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Plus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useKit } from '../../context/KitContext';
 
@@ -100,15 +100,21 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
 
         {/* BOTÓN MÁGICO DE SELECCIÓN */}
         <button 
-          onClick={() => toggleTool(tool)}
-          className={`p-1.5 rounded-lg border transition-colors ${
+          onClick={() => {
+            // Haptic feedback for mobile devices
+            if (navigator.vibrate) {
+              navigator.vibrate(50);
+            }
+            toggleTool(tool);
+          }}
+          className={`p-2 rounded-lg border transform transition-all duration-200 active:scale-95 ${
             isSelected 
-              ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+              ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
               : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100'
           }`}
           title={isSelected ? "Quitar de la lista" : "Agregar a lista"}
         >
-          {isSelected ? <Check size={18} /> : <FolderPlus size={18} />}
+          {isSelected ? <Check size={18} /> : <Plus size={18} />}
         </button>
       </div>
     </div>

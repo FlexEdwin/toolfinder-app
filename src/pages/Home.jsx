@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, FolderPlus, Check } from 'lucide-react';
+import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, Plus, Check } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
 import { Link } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
@@ -231,15 +231,21 @@ export default function Home() {
           </button>
 
           <button
-            onClick={() => toggleTool(tool)}
-            className={`p-1.5 rounded transition-colors ${
+            onClick={() => {
+              // Haptic feedback for mobile devices
+              if (navigator.vibrate) {
+                navigator.vibrate(50);
+              }
+              toggleTool(tool);
+            }}
+            className={`p-2 rounded transform transition-all duration-200 active:scale-95 ${
               isSelected 
-                ? 'bg-blue-600 text-white' 
+                ? 'bg-green-600 text-white' 
                 : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
             }`}
             title={isSelected ? "Quitar" : "Agregar"}
           >
-            {isSelected ? <Check size={16} /> : <FolderPlus size={16} />}
+            {isSelected ? <Check size={16} /> : <Plus size={16} />}
           </button>
         </div>
       </div>

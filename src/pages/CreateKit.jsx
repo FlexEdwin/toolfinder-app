@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
 import { supabase } from '../lib/supabaseClient';
@@ -11,7 +11,16 @@ export default function CreateKit() {
   
   const [kitName, setKitName] = useState("");
   const [authorName, setAuthorName] = useState("");
+  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Load author name from localStorage on mount
+  useEffect(() => {
+    const savedAuthor = localStorage.getItem('lastAuthorName');
+    if (savedAuthor) {
+      setAuthorName(savedAuthor);
+    }
+  }, []);
 
   // Si no hay herramientas, mostrar aviso
   if (selectedTools.length === 0) {
@@ -46,6 +55,7 @@ export default function CreateKit() {
           { 
             name: kitName, 
             author_name: authorName,
+            description: description || null,
           }
         ])
         .select()
@@ -65,7 +75,10 @@ export default function CreateKit() {
 
       if (itemsError) throw itemsError;
 
-      // 3. Éxito: Limpiar y Redirigir
+      // 3. Save author name to localStorage
+      localStorage.setItem('lastAuthorName', authorName);
+
+      // 4. Éxito: Limpiar y Redirigir
       toast.success("✅ Lista creada con éxito");
       clearKit();
       navigate('/kits');
@@ -119,6 +132,18 @@ export default function CreateKit() {
                 />
                 <User className="absolute left-3 top-3.5 text-slate-400" size={18} />
               </div>
+            </div>
+
+            {/* Descripción (Opcional) */}
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">Notas / Descripción (opcional)</label>
+              <textarea 
+                rows={3}
+                placeholder="Ej: Para mantenimiento preventivo mensual..."
+                className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+              />
             </div>
 
             <button 

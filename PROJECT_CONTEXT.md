@@ -2,37 +2,41 @@
 
 ## 1. Estado del Proyecto
 
-**Fase Actual:** Inicio de FASE 3 (Gestión de Kits y Flujos de Trabajo).
-**Fases Completadas:**
+**Fase Actual:** FASE 3 COMPLETADA (UX y Kits optimizados). Listo para Fase 4.
+**Progreso:**
 
-- Fase 1: Core Tecnológico (Búsqueda Server-Side, React Query).
-- Fase 2: UX Móvil y Visualización (List View, Sticky Headers, Data Cleaning).
+- Fase 1: Core Tecnológico (Server-Side Search, React Query).
+- Fase 2: Data Cleaning & Visualización (List View, Sticky Headers).
+- Fase 3: Gestión de Kits (Smart Form, Smart Selection, WhatsApp Share).
 
 ## 2. Base de Datos (Supabase)
 
 **Estado:** SANITIZADA Y CATEGORIZADA.
 
-- **Limpieza:** Se eliminaron sufijos `-AV` y duplicados. Trigger `clean_part_number` activo.
-- **Categorías:** Migración masiva de "General" a 10 Super-Categorías (Medición, GSE, Aviónica, etc.).
-- **Búsqueda:** RPC `search_tools_smart` con sensibilidad 0.3 (Alta precisión).
+- **Limpieza:** Eliminados sufijos `-AV`, duplicados y espacios. Trigger activo.
+- **Categorías:** 10 Super-Categorías (Medición, GSE, etc.).
+- **Búsqueda:** `search_tools_smart` (Sensibilidad 0.3).
+- **Conteo:** `count_tools_smart` para totales reales.
+- **Kits:** Tabla actualizada con columna `description`.
 
 ## 3. Frontend (React + Vite)
 
-- **Vistas:** Toggle entre Grid (Exploración) y List (Compacta/Técnica).
-- **Responsive:**
-  - List View: Layout adaptativo (Columna en móvil para priorizar Part Number).
-  - Sticky Header: Buscador siempre visible.
-  - Keyboard Dismiss: El teclado se oculta al hacer scroll.
-- **Componentes Clave:** `ToolCard` (Grid) y `ToolListRow` (Lista).
+- **UX Móvil:**
+  - Botones de selección táctiles (`+` azul / `✓` verde) con vibración.
+  - Teclado se oculta al hacer scroll.
+  - Vista de Lista responsiva (P/N debajo del nombre en móvil).
+- **Kits:**
+  - Creación inteligente (recuerda autor).
+  - Modal de detalles con acciones: Copiar al portapapeles y Enviar a WhatsApp.
+  - Formato de texto limpio para compartir.
 
-## 4. Próximos Pasos (Roadmap Fase 3)
+## 4. Próximos Pasos (Opciones Fase 4)
 
-1.  **Optimización de Kits:** Mejorar el flujo de "Agregar a Kit" (Feedback visual, contador flotante).
-2.  **Kits Públicos:** Asegurar que los kits creados sean visibles y clonables por otros usuarios.
-3.  **Detalle de Herramienta:** Mejorar el Modal de detalles (integrar imágenes si las hubiera en el futuro).
+- **Opción A:** Escáner de Código de Barras + PWA (Offline Mode).
+- **Opción B:** Sistema de Imágenes + Panel Admin UI.
 
 ## 5. Reglas de Negocio Vigentes
 
-- El **Part Number** es el dato más crítico para el operario.
-- La interfaz debe ser **Mobile-First** (80% uso en celular).
-- Búsqueda tolerante a fallos pero estricta con basura (0.3 threshold).
+- El **Part Number** es el dato rey.
+- La app debe ser rápida y manejable con una sola mano (Mobile First).
+- La confidencialidad de proveedores locales está protegida (Part Numbers limpios).

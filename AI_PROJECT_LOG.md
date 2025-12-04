@@ -275,3 +275,75 @@ El contador mostraba `allTools.length` (20 items cargados), no el total real que
 ✅ El contador ahora muestra el total real de la base de datos.
 ✅ Los usuarios ven cuántos resultados existen, no solo cuántos están cargados.
 ✅ Performance optimizada con caché de 1 minuto.
+
+### [04/12/2025] - MEJORAS DE UX: SELECCIÓN, FORMULARIOS Y COMPARTIR
+
+**Objetivo:**
+Implementar tres mejoras críticas de UX basadas en feedback de usuarios: mejor feedback visual de selección, persistencia de formularios, y funciones de compartir inteligentes.
+
+**1. Botones de Selección Mejorados (ToolCard.jsx + Home.jsx)**
+
+**Cambios Visuales:**
+
+- **Iconos unificados:** Reemplazado FolderPlus/Check por Plus/Check
+- **Estados de color:**
+  - No seleccionado: Icono `+` con fondo azul (`bg-blue-50`)
+  - Seleccionado: Icono `✓` con fondo **verde** (`bg-green-600`)
+- **Animación suave:**
+  - Clase: `transform transition-all duration-200 active:scale-95`
+  - Efecto: Escala al 95% al hacer clic con transición de 200ms
+  - Resultado: Feedback visual no robótico, bouncy y natural
+- **Feedback táctil:**
+  - Implementado `navigator.vibrate(50)` para dispositivos móviles
+  - Vibración de 50ms confirma la acción
+
+**Archivos modificados:**
+
+- `src/components/tools/ToolCard.jsx`: Botón footer actualizado
+- `src/pages/Home.jsx`: Componente `ToolListRow` actualizado
+
+**2. Formulario Inteligente (CreateKit.jsx)**
+
+**Persistencia de Autor:**
+
+- **Al montar:** `useEffect` carga `localStorage.getItem('lastAuthorName')`
+- **Al guardar:** `localStorage.setItem('lastAuthorName', authorName)`
+- **Beneficio:** Los usuarios no tienen que reescribir su nombre cada vez
+
+**Nuevo Campo Descripción:**
+
+- **Label:** "Notas / Descripción (opcional)"
+- **Tipo:** `<textarea rows={3}>`
+- **Placeholder:** "Ej: Para mantenimiento preventivo mensual..."
+- **Persistencia:** Se envía a Supabase como `description: description || null`
+- **Nota:** El campo DB debe existir o agregarse después
+
+**Archivos modificados:**
+
+- `src/pages/CreateKit.jsx`: Agregado useEffect, estado description, y textarea
+
+**3. Smart Sharing (Kits.jsx)**
+
+**Action Bar Sticky:** Implementado en footer del modal con `sticky bottom-0 bg-white/95 backdrop-blur-sm`.
+
+**Funciones de compartir:**
+
+- `generateKitText()`: Genera formato limpio `📋 [Nombre]\n\n[PN] [Tool]\n...` (sin categorías)
+- `handleCopyKit()`: Copia al portapapeles con toast de confirmación
+- `handleShareWhatsApp()`: Abre WhatsApp Web con texto pre-llenado
+
+**Botones:**
+
+- **Copiar (azul):** `navigator.clipboard.writeText()` + icono Copy
+- **WhatsApp (verde):** `window.open('https://wa.me/?text=...')` + icono Share2
+- **Cerrar (secundario):** Estilo `bg-slate-100`, posicionado a la derecha
+
+**Padding:** Agregado `pb-24` al contenedor de herramientas para evitar overlap con action bar.
+
+**Archivos modificados:** `src/pages/Kits.jsx`
+
+**Resultado:**
+✅ Selección de herramientas con feedback visual mejorado (verde + animación).
+✅ Formulario de creación más inteligente con persistencia.
+✅ Experiencia táctil en móviles con vibración.
+✅ Modal de kits con smart sharing (Copy + WhatsApp).
