@@ -17,6 +17,7 @@ import UI_LABELS from '../../constants/uiLabels';
 
 export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { selectedTools, toggleTool } = useKit();
 
   // Verificar si esta herramienta ya está en el carrito
@@ -85,10 +86,25 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
       )}
 
       <div className="p-4 flex-grow">
-        <div className="mb-2.5">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2.5 transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
-            {getIcon(tool.category)}
+        {/* Image or Icon */}
+        {tool.image_url && !imageError ? (
+          <div className="mb-3 w-full h-48 rounded-lg overflow-hidden bg-slate-100">
+            <img
+              src={tool.image_url}
+              alt={tool.name}
+              className="w-full h-full object-contain"
+              onError={() => setImageError(true)}
+            />
           </div>
+        ) : (
+          <div className="mb-2.5">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2.5 transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
+              {getIcon(tool.category)}
+            </div>
+          </div>
+        )}
+
+        <div className="mb-2.5">
           <h3 className="font-semibold text-slate-800 leading-tight text-base">
             {tool.name}
           </h3>

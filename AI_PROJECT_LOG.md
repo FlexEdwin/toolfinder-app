@@ -484,3 +484,114 @@ notify.duplicatePN();
 ✅ Sistema de notificaciones centralizado.
 ✅ ~100 líneas de código eliminadas de Home.jsx.
 ✅ Performance mejorada (menos re-renders).
+
+### [04/12/2025] - FEATURE: SISTEMA DE IMÁGENES PARA HERRAMIENTAS
+
+**Objetivo:**
+Implementar sistema completo de imágenes para herramientas, permitiendo al admin agregar URLs de imágenes y mostrándolas públicamente en la app con fallback inteligente.
+
+**1. Modal de Administración (ToolFormModal)**
+
+**Campo de Imagen agregado:**
+
+- Input tipo `url` para URL de imagen
+- Placeholder: `https://ejemplo.com/imagen.jpg`
+- Campo opcional (no rompe tools existentes)
+
+**Botón "Buscar en Google":**
+
+- Icono: `ExternalLink`
+- Comportamiento: Abre Google Images search con el Part Number
+- URL: `https://www.google.com/search?tbm=isch&q=[PartNumber]`
+- Disabled si no hay Part Number ingresado
+
+**Vista Previa en Tiempo Real:**
+
+- Muestra thumbnail 32x32px de la imagen
+- Se actualiza al cambiar URL
+- Manejo de errores: Si la imagen falla, muestra placeholder con ícono y mensaje
+- Background blanco con borde para ver imágenes transparentes
+
+**Persistencia:**
+
+- Campo `image_url` incluido en `formData`
+- Se guarda/actualiza en Supabase junto con otros datos
+
+**2. Visualización Pública - Grid View (ToolCard)**
+
+**Con Imagen:**
+
+- Área dedicada 48px (h-48) en parte superior del card
+- `object-contain` para mantener proporciones
+- Background `bg-slate-100` para imágenes transparentes
+- Rounded corners para consistencia visual
+
+**Sin Imagen:**
+
+- Fallback al icono tradicional con background de categoría
+- Misma experiencia que antes para herramientas legacy
+
+**Manejo de Errores:**
+
+- Estado `imageError` con `onError` handler
+- Si imagen rompe, muestra icono automáticamente
+- Usuario no ve ningún error visual
+
+**3. Visualización Pública - List View (ToolListRow)**
+
+**Con Imagen:**
+
+- Thumbnail 40x40px a la izquierda
+- `object-cover` para llenar espacio cuadrado
+- Rounded corners (`rounded-lg`)
+- Reemplaza emoji icon cuando disponible
+
+**Sin Imagen:**
+
+- Muestra emoji icon tradicional (⚡🛡️📏🔧)
+- Experiencia consistente con versión previa
+
+**Manejo de Errores:**
+
+- Mismo sistema que ToolCard
+- Fallback silencioso a emoji si imagen falla
+
+**4. Implementación Técnica**
+
+**Estados agregados:**
+
+```javascript
+const [imageError, setImageError] = useState(false);
+```
+
+**Componentes actualizados:**
+
+- `ToolFormModal.jsx`: +50 líneas (campo, botón, preview)
+- `ToolCard.jsx`: +15 líneas (imagen grande)
+- `ToolListRow.jsx`: +14 líneas (thumbnail)
+
+**Íconos nuevos (lucide-react):**
+
+- `ExternalLink` - Botón de búsqueda Google
+- `Image` - Placeholder de error
+
+**Beneficios:**
+
+- ✅ Admin puede visualizar herramientas antes de guardar
+- ✅ Búsqueda Google integrada ahorra tiempo
+- ✅ Imágenes mejoran identificación de herramientas
+- ✅ Fallback automático no rompe experiencia
+- ✅ Compatible con herramientas existentes (sin imagen)
+
+**Archivos modificados:**
+
+- `src/components/tools/ToolFormModal.jsx`
+- `src/components/tools/ToolCard.jsx`
+- `src/components/tools/ToolListRow.jsx`
+
+**Resultado:**
+✅ Sistema de imágenes completo e implementado.
+✅ Modal de admin con búsqueda Google y preview.
+✅ Visualización en Grid (grande) y List (thumbnail).
+✅ Manejo robusto de errores con fallback.
+✅ Backward compatible con herramientas sin imagen.

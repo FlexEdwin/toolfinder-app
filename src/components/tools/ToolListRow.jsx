@@ -15,6 +15,7 @@ import { useKit } from '../../context/KitContext';
  */
 export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { selectedTools, toggleTool } = useKit();
   const isSelected = selectedTools.some(t => t.id === tool.id);
 
@@ -44,9 +45,21 @@ export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
     <div className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-all hover:shadow-md ${
       isSelected ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'
     }`}>
-      {/* Left: Icon + Content (responsive layout) */}
+      {/* Left: Icon/Image + Content (responsive layout) */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        <span className="text-2xl flex-shrink-0">{getIcon(tool.category)}</span>
+        {/* Image or Emoji Icon */}
+        {tool.image_url && !imageError ? (
+          <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+            <img
+              src={tool.image_url}
+              alt={tool.name}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+            />
+          </div>
+        ) : (
+          <span className="text-2xl flex-shrink-0">{getIcon(tool.category)}</span>
+        )}
         
         {/* Content container - changes from column (mobile) to row (desktop) */}
         <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:gap-4">
