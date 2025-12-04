@@ -1,6 +1,19 @@
 import { Copy, Plus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useKit } from '../../context/KitContext';
+import UI_LABELS from '../../constants/uiLabels';
+
+/**
+ * ToolCard Component
+ * Displays a tool in card format with actions (copy, select, edit, delete)
+ * 
+ * @param {Object} props - Component props
+ * @param {Object} props.tool - Tool object with name, part_number, category, specs
+ * @param {boolean} props.isAdmin - Whether current user has admin privileges
+ * @param {Function} props.onEdit - Callback when edit button is clicked
+ * @param {Function} props.onDelete - Callback when delete button is clicked
+ * @returns {JSX.Element} Tool card component
+ */
 
 export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
@@ -9,6 +22,11 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
   // Verificar si esta herramienta ya está en el carrito
   const isSelected = selectedTools.some(t => t.id === tool.id);
 
+  /**
+   * Get category icon based on category name
+   * @param {string} category - Category name
+   * @returns {JSX.Element} Icon component
+   */
   const getIcon = (category) => {
     const cat = category?.toLowerCase() || '';
     if (cat.includes('eléctrico') || cat.includes('electric')) return <Zap size={18} />;
@@ -17,6 +35,9 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
     return <Wrench size={18} />;
   };
 
+  /**
+   * Copy part number to clipboard and show feedback
+   */
   const copyToClipboard = () => {
     navigator.clipboard.writeText(tool.part_number);
     setCopied(true);
@@ -95,7 +116,7 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
           onClick={copyToClipboard}
           className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
         >
-          {copied ? '¡Copiado!' : <><Copy size={14} /> Copiar</>}
+          {copied ? UI_LABELS.TOOL_ACTION_COPIED : <><Copy size={14} /> {UI_LABELS.TOOL_ACTION_COPY}</>}
         </button>
 
         {/* BOTÓN MÁGICO DE SELECCIÓN */}
@@ -112,7 +133,7 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
               ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
               : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100'
           }`}
-          title={isSelected ? "Quitar de la lista" : "Agregar a lista"}
+          title={isSelected ? UI_LABELS.TOOL_ACTION_REMOVE : UI_LABELS.TOOL_ACTION_ADD}
         >
           {isSelected ? <Check size={18} /> : <Plus size={18} />}
         </button>

@@ -14,6 +14,7 @@ import { useTools } from '../hooks/useTools';
 import { useCategories } from '../hooks/useCategories';
 import { useToolCount } from '../hooks/useToolCount';
 import { useQueryClient } from '@tanstack/react-query';
+import UI_LABELS from '../constants/uiLabels';
 
 export default function Home() {
   const { count, selectedTools, toggleTool } = useKit();
@@ -261,7 +262,7 @@ export default function Home() {
           
           <div className="max-w-3xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-white text-2xl font-bold">Catálogo Maestro</h2>
+              <h2 className="text-white text-2xl font-bold">{UI_LABELS.HOME_TITLE}</h2>
               
               {user && (
                 <div className="flex gap-2">
@@ -270,7 +271,7 @@ export default function Home() {
                     className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-lg text-sm font-bold transition-all border border-slate-600"
                   >
                     <Filter size={16} />
-                    Gestionar Categorías
+                    {UI_LABELS.ACTION_MANAGE_CATEGORIES}
                   </button>
                   <button
                     onClick={() => {
@@ -280,7 +281,7 @@ export default function Home() {
                     className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg"
                   >
                     <PlusCircle size={18} />
-                    Nueva Herramienta
+                    {UI_LABELS.ACTION_NEW_TOOL}
                   </button>
                 </div>
               )}
@@ -289,7 +290,7 @@ export default function Home() {
             <div className="relative group">
               <input
                 type="text"
-                placeholder="Buscar herramienta, P/N, o descripción..."
+                placeholder={UI_LABELS.HOME_SEARCH_PLACEHOLDER}
                 className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-xl"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -311,11 +312,11 @@ export default function Home() {
                   : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
               }`}
             >
-              Todas
+              {UI_LABELS.CATEGORY_ALL}
             </button>
             
             {loadingCats ? (
-              <span className="text-slate-400 text-sm px-4 py-1.5">Cargando filtros...</span>
+              <span className="text-slate-400 text-sm px-4 py-1.5">{UI_LABELS.CATEGORY_LOADING}</span>
             ) : (
               categoriesData.map(cat => (
                 <button
@@ -357,13 +358,13 @@ export default function Home() {
                     <span className="text-blue-600 text-sm">Contando...</span>
                   ) : !searchTerm ? (
                     <span className="text-blue-900 font-bold text-sm sm:text-base">
-                      Explorando {selectedCategory === "Todas" ? "Catálogo Maestro" : selectedCategory} ({totalCount.toLocaleString()} herramientas)
+                      {UI_LABELS.RESULTS_EXPLORING} {selectedCategory === UI_LABELS.CATEGORY_ALL ? UI_LABELS.HOME_TITLE : selectedCategory} ({totalCount.toLocaleString()} {UI_LABELS.RESULTS_TOOLS})
                     </span>
                   ) : (
                     <>
                       <span className="text-blue-900 font-bold text-lg">{totalCount.toLocaleString()}</span>
                       <span className="text-blue-600 text-sm ml-2">
-                        {totalCount === 1 ? 'resultado encontrado' : 'resultados encontrados'}
+                        {totalCount === 1 ? UI_LABELS.RESULTS_FOUND_SINGULAR : UI_LABELS.RESULTS_FOUND_PLURAL}
                       </span>
                     </>
                   )}
@@ -373,7 +374,7 @@ export default function Home() {
                     onClick={() => {setSearchTerm(""); setSelectedCategory("Todas");}}
                     className="text-slate-500 hover:text-slate-700 text-sm font-medium underline"
                   >
-                    Limpiar filtros
+                    {UI_LABELS.RESULTS_CLEAR_FILTERS}
                   </button>
                 )}
               </div>
@@ -446,7 +447,7 @@ export default function Home() {
                       Cargando...
                     </>
                   ) : (
-                    'Cargar más herramientas...'
+                    UI_LABELS.ACTION_LOAD_MORE
                   )}
                 </button>
               </div>
@@ -455,7 +456,7 @@ export default function Home() {
             {allTools.length === 0 && (
               <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
                 <Filter className="mx-auto text-slate-300 mb-2" size={48} />
-                <p className="text-slate-500">No encontramos herramientas con ese criterio.</p>
+                <p className="text-slate-500">{UI_LABELS.RESULTS_NO_TOOLS}</p>
                 <button 
                   onClick={() => {setSearchTerm(""); setSelectedCategory("Todas");}}
                   className="mt-2 text-blue-600 font-medium hover:underline"

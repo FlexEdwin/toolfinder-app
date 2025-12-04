@@ -347,3 +347,56 @@ Implementar tres mejoras críticas de UX basadas en feedback de usuarios: mejor 
 ✅ Formulario de creación más inteligente con persistencia.
 ✅ Experiencia táctil en móviles con vibración.
 ✅ Modal de kits con smart sharing (Copy + WhatsApp).
+
+### [04/12/2025] - REFACTORIZACIÓN: CENTRALIZACIÓN DE TEXTOS Y DOCUMENTACIÓN
+
+**Objetivo:**
+Mejorar la mantenibilidad del código mediante centralización de textos UI, documentación JSDoc, y auditoría completa de código limpio.
+
+**1. Centralización de Textos UI**
+
+**Archivo creado:** `src/constants/uiLabels.js`
+
+**Renombres implementados:**
+
+- "Catálogo Maestro" → "Inventario Global"
+- "Conocimiento Colectivo" → "Biblioteca de Kits"
+- "Ranking en Tiempo Real" → "Listas Destacadas"
+- Descripción de kits → "Configuraciones estandarizadas para tareas operativas."
+
+**Beneficios:**
+
+- ✅ Cambios de texto en un solo lugar
+- ✅ Preparado para internacionalización (i18n) futura
+- ✅ Consistencia en toda la aplicación
+- ✅ 60+ labels centralizados
+
+**Componentes actualizados:**
+
+- `Home.jsx`: 15+ labels (título, placeholders, mensajes)
+- `Kits.jsx`: 10+ labels (header, modal, acciones)
+- `ToolCard.jsx`: 5+ labels (acciones, tooltips)
+- `CreateKit.jsx`: Labels de formulario y toasts
+
+**2. Documentación JSDoc**
+
+**Archivos documentados:**
+
+- `ToolCard.jsx`: Componente principal + funciones helper
+- `useTools.js`: Ya tenía documentación completa ✅
+
+**3. Auditoría de Código**
+
+**Console.logs:** ✅ Ninguno encontrado
+**Importaciones:** ✅ Todas necesarias
+**Lógica Compleja:** Identificada y documentada en sugerencias
+
+**4. Sugerencias de Mejoras**
+
+**Archivo creado:** `code_suggestions.md` con mejoras propuestas para refactorización futura.
+
+**Resultado:**
+✅ Código más limpio y mantenible.
+✅ Labels centralizados para cambios rápidos.
+✅ Documentación JSDoc para mejor DX.
+✅ Roadmap de mejoras futuras documentado.

@@ -4,6 +4,7 @@ import { Loader2, TrendingUp, AlertCircle, X, Copy, Share2 } from 'lucide-react'
 import KitCard from '../components/social/KitCard';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import UI_LABELS from '../constants/uiLabels';
 
 export default function Kits() {
   const { user } = useAuth();
@@ -143,11 +144,11 @@ export default function Kits() {
       <div className="bg-slate-900 pt-8 pb-12 px-4 shadow-lg mb-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-slate-800 text-blue-400 px-3 py-1 rounded-full text-xs font-bold mb-3 border border-slate-700">
-            <TrendingUp size={14} /> Ranking en Tiempo Real
+            <TrendingUp size={14} /> {UI_LABELS.KITS_BADGE}
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Conocimiento Colectivo</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">{UI_LABELS.KITS_TITLE}</h1>
           <p className="text-slate-400 max-w-xl mx-auto">
-            Descubre las listas de herramientas más votadas por los expertos de la planta.
+            {UI_LABELS.KITS_SUBTITLE}
           </p>
         </div>
       </div>
@@ -188,7 +189,7 @@ export default function Kits() {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-slate-800">{selectedKit.name}</h2>
-                <p className="text-slate-500 text-sm mt-1">Por {selectedKit.author_name || 'Anónimo'}</p>
+                <p className="text-slate-500 text-sm mt-1">{UI_LABELS.MODAL_BY_AUTHOR} {selectedKit.author_name || UI_LABELS.MODAL_BY_ANON}</p>
               </div>
               <button 
                 onClick={closeKitModal}
@@ -263,7 +264,7 @@ export default function Kits() {
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-sm"
                 >
                   <Copy size={16} />
-                  Copiar
+                  {UI_LABELS.MODAL_ACTION_COPY}
                 </button>
                 
                 <button 
@@ -271,7 +272,7 @@ export default function Kits() {
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm"
                 >
                   <Share2 size={16} />
-                  WhatsApp
+                  {UI_LABELS.MODAL_ACTION_WHATSAPP}
                 </button>
               </div>
               
@@ -279,7 +280,7 @@ export default function Kits() {
                 onClick={closeKitModal}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors font-medium"
               >
-                Cerrar
+                {UI_LABELS.MODAL_ACTION_CLOSE}
               </button>
             </div>
           </div>

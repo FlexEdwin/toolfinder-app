@@ -4,6 +4,7 @@ import { useKit } from '../context/KitContext';
 import { supabase } from '../lib/supabaseClient';
 import { Save, User, Package, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import UI_LABELS from '../constants/uiLabels';
 
 export default function CreateKit() {
   const { selectedTools, toggleTool, clearKit } = useKit();
