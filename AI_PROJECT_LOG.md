@@ -400,3 +400,87 @@ Mejorar la mantenibilidad del código mediante centralización de textos UI, doc
 ✅ Labels centralizados para cambios rápidos.
 ✅ Documentación JSDoc para mejor DX.
 ✅ Roadmap de mejoras futuras documentado.
+
+### [04/12/2025] - ARQUITECTURA: EXTRACCIÓN DE COMPONENTES Y SISTEMA DE NOTIFICACIONES
+
+**Objetivo:**
+Aplicar mejoras arquitectónicas sugeridas para mejorar performance, mantenibilidad y estructura del código.
+
+**1. Extracción de ToolListRow**
+
+**Problema:** Componente `ToolListRow` definido dentro de `Home()` causaba re-renders innecesarios en cada actualización del componente padre.
+
+**Solución:**
+
+- Extraído a archivo independiente: `src/components/tools/ToolListRow.jsx`
+- Agregada documentación JSDoc completa
+- Componente usa sus propios hooks (`useKit`, `useState`)
+- Maneja su propio estado local (`copied`)
+
+**Beneficios:**
+
+- ⚡ Mejor performance (no se re-crea en cada render de Home)
+- 📦 Código más modular y reutilizable
+- 🧪 Más fácil de testear aisladamente
+- 📉 Home.jsx reducido en ~100 líneas de código
+
+**2. Sistema de Notificaciones Centralizado**
+
+**Archivo creado:** `src/utils/notifications.js`
+
+**Funciones implementadas:**
+
+```javascript
+notify.kitCreated();
+notify.kitDeleted();
+notify.kitCopied();
+notify.toolCreated();
+notify.toolUpdated();
+notify.toolDeleted();
+notify.error(message);
+notify.deleteError(message);
+notify.formIncomplete();
+notify.duplicatePN();
+```
+
+**Componentes actualizados:**
+
+- `Home.jsx`: 8 llamadas a toast reemplazadas
+- `Kits.jsx`: 3 llamadas a toast reemplazadas
+- `CreateKit.jsx`: 3 llamadas a toast reemplazadas
+
+**Beneficios:**
+
+- ✅ Mensajes consistentes usando UI_LABELS
+- ✅ Un solo lugar para modificar notificaciones
+- ✅ Código más limpio y autodocumentado
+- ✅ Fácil agregar logging o analytics en el futuro
+
+**3. Limpieza de Home.jsx**
+
+**Antes:** 527 líneas (con ToolListRow interno)
+**Después:** ~430 líneas
+
+**Eliminado:**
+
+- Componente interno `ToolListRow` (100 líneas)
+- Imports innecesarios de `useState` para ToolListRow
+- Llamadas directas a `toast` (reemplazadas por `notify`)
+
+**Archivos creados:**
+
+- `src/components/tools/ToolListRow.jsx` (NUEVO)
+- `src/utils/notifications.js` (NUEVO)
+
+**Archivos modificados:**
+
+- `src/pages/Home.jsx` (-100 líneas, +2 imports)
+- `src/pages/Kits.jsx` (+1 import, 3 notificaciones)
+- `src/pages/CreateKit.jsx` (+1 import, 3 notificaciones)
+
+**Resultado:**
+✅ Home.jsx mucho más limpio y mantenible.
+✅ ToolListRow independiente y reutilizable.
+✅ Sistema de notificaciones centralizado.
+✅ ~100 líneas de código eliminadas de Home.jsx.
+✅ Performance mejorada (menos re-renders).

@@ -5,6 +5,7 @@ import KitCard from '../components/social/KitCard';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import UI_LABELS from '../constants/uiLabels';
+import notify from '../utils/notifications';
 
 export default function Kits() {
   const { user } = useAuth();
@@ -94,9 +95,9 @@ export default function Kits() {
       if (error) throw error;
       
       setKits(prev => prev.filter(k => k.id !== kitId));
-      toast.success("✅ Lista eliminada correctamente");
+      notify.kitDeleted();
     } catch (err) {
-      toast.error("⚠️ Error al borrar: " + err.message);
+      notify.deleteError(err.message);
     }
   };
 
@@ -128,7 +129,7 @@ export default function Kits() {
   const handleCopyKit = () => {
     const text = generateKitText(selectedKit);
     navigator.clipboard.writeText(text);
-    toast.success('✅ Lista copiada al portapapeles');
+    notify.kitCopied();
   };
 
   const handleShareWhatsApp = () => {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, Plus, Check } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
+import ToolListRow from '../components/tools/ToolListRow';
 import { Link } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
 import { ArrowRight } from 'lucide-react';
@@ -15,6 +16,7 @@ import { useCategories } from '../hooks/useCategories';
 import { useToolCount } from '../hooks/useToolCount';
 import { useQueryClient } from '@tanstack/react-query';
 import UI_LABELS from '../constants/uiLabels';
+import notify from '../utils/notifications';
 
 export default function Home() {
   const { count, selectedTools, toggleTool } = useKit();
@@ -94,7 +96,7 @@ export default function Home() {
           .eq('id', editingTool.id);
 
         if (error) throw error;
-        toast.success("✅ Herramienta actualizada");
+        notify.toolUpdated();
       } else {
         const { data, error } = await supabase
           .from('tools')
@@ -103,7 +105,7 @@ export default function Home() {
           .single();
 
         if (error) throw error;
-        toast.success("✅ Herramienta creada con éxito");
+        notify.toolCreated();
         
         if (toolData.category && !categoriesData.includes(toolData.category)) {
           queryClient.invalidateQueries({ queryKey: ['categories'] });
@@ -116,9 +118,9 @@ export default function Home() {
     } catch (error) {
       console.error('Error saving tool:', error);
       if (error.code === '23505') {
-        toast.error("⚠️ Ya existe una herramienta con ese Part Number");
+        notify.duplicatePN();
       } else {
-        toast.error("⚠️ Error al guardar: " + error.message);
+        notify.error(error.message);
       }
       throw error;
     }
@@ -143,115 +145,17 @@ export default function Home() {
 
       if (error) throw error;
 
-      toast.success("✅ Herramienta eliminada");
+      notify.toolDeleted();
       setShowDeleteConfirm(false);
       
       queryClient.invalidateQueries({ queryKey: ['tools'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     } catch (error) {
-      toast.error("⚠️ Error al eliminar: " + error.message);
+      notify.error(error.message);
     }
   };
 
-  // List view row component
-  const ToolListRow = ({ tool, isAdmin, onEdit, onDelete }) => {
-    const [copied, setCopied] = useState(false);
-    const isSelected = selectedTools.some(t => t.id === tool.id);
 
-    const copyToClipboard = () => {
-      navigator.clipboard.writeText(tool.part_number);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
-
-    const getIcon = (category) => {
-      const cat = category?.toLowerCase() || '';
-      if (cat.includes('eléctrico') || cat.includes('electric')) return '⚡';
-      if (cat.includes('seguridad')) return '🛡️';
-      if (cat.includes('medición')) return '📏';
-      return '🔧';
-    };
-
-    return (
-      <div className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-all hover:shadow-md ${
-        isSelected ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'
-      }`}>
-        {/* Left: Icon + Content (responsive layout) */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <span className="text-2xl flex-shrink-0">{getIcon(tool.category)}</span>
-          
-          {/* Content container - changes from column (mobile) to row (desktop) */}
-          <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:gap-4">
-            {/* Name + Category */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-slate-800 truncate text-sm">{tool.name}</h3>
-              {/* Category - only visible on desktop */}
-              <span className="hidden md:inline-block text-xs text-gray-400">{tool.category}</span>
-            </div>
-            
-            {/* Part Number - ALWAYS VISIBLE */}
-            <div className="mt-1 md:mt-0 flex-shrink-0">
-              <code className="font-mono text-sm font-bold text-blue-700 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
-                {tool.part_number}
-              </code>
-            </div>
-          </div>
-        </div>
-
-
-
-        {/* Right: Action Buttons */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {isAdmin && (
-            <>
-              <button
-                onClick={() => onEdit(tool)}
-                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                title="Editar"
-              >
-                <PlusCircle size={14} />
-              </button>
-              <button
-                onClick={() => onDelete(tool.id)}
-                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                title="Eliminar"
-              >
-                <Filter size={14} />
-              </button>
-            </>
-          )}
-          
-          <button
-            onClick={copyToClipboard}
-            className={`p-1.5 rounded transition-colors ${
-              copied ? 'bg-green-50 text-green-600' : 'hover:bg-slate-100 text-slate-600'
-            }`}
-            title="Copiar P/N"
-          >
-            <Copy size={14} />
-          </button>
-
-          <button
-            onClick={() => {
-              // Haptic feedback for mobile devices
-              if (navigator.vibrate) {
-                navigator.vibrate(50);
-              }
-              toggleTool(tool);
-            }}
-            className={`p-2 rounded transform transition-all duration-200 active:scale-95 ${
-              isSelected 
-                ? 'bg-green-600 text-white' 
-                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-            }`}
-            title={isSelected ? "Quitar" : "Agregar"}
-          >
-            {isSelected ? <Check size={16} /> : <Plus size={16} />}
-          </button>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">

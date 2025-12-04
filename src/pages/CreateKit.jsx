@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import { Save, User, Package, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import UI_LABELS from '../constants/uiLabels';
+import notify from '../utils/notifications';
 
 export default function CreateKit() {
   const { selectedTools, toggleTool, clearKit } = useKit();
@@ -42,7 +43,7 @@ export default function CreateKit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!kitName.trim() || !authorName.trim()) {
-      toast.error("⚠️ Por favor completa todos los campos");
+      notify.formIncomplete();
       return;
     }
 
@@ -80,13 +81,13 @@ export default function CreateKit() {
       localStorage.setItem('lastAuthorName', authorName);
 
       // 4. Éxito: Limpiar y Redirigir
-      toast.success("✅ Lista creada con éxito");
+      notify.kitCreated();
       clearKit();
       navigate('/kits');
       
     } catch (error) {
       console.error(error);
-      toast.error("⚠️ Error al guardar: " + error.message);
+      notify.error(error.message);
       setIsSubmitting(false);
     }
   };
