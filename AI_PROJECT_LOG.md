@@ -595,3 +595,34 @@ const [imageError, setImageError] = useState(false);
 ✅ Visualización en Grid (grande) y List (thumbnail).
 ✅ Manejo robusto de errores con fallback.
 ✅ Backward compatible con herramientas sin imagen.
+
+### [05/12/2025] - FIX CRÍTICO: BUG DE TECLADO EN MÓVILES
+
+**Problema Reportado:**
+Los usuarios móviles experimentaban un bug crítico de UX donde el teclado se abría y cerraba inmediatamente al tocar el input de búsqueda.
+
+**Causa Raíz:**
+El `useEffect` de "Dismiss Keyboard" en `Home.jsx` estaba escuchando el evento `scroll`. Cuando el teclado se abre en móviles, el navegador ajusta automáticamente el viewport (auto-scroll para mantener el input visible), lo cual disparaba el listener del evento `scroll` y forzaba un `blur()` inmediato e indeseado.
+
+**Solución Implementada:**
+
+**Archivo modificado:** `src/pages/Home.jsx` (líneas 47-62)
+
+**Cambios:**
+
+1. **Eliminado:** Listener del evento `scroll` (tanto `addEventListener` como `removeEventListener`)
+2. **Mantenido:** Listener del evento `touchmove` únicamente
+3. **Renombrado:** `handleScroll` → `handleTouchMove` para claridad
+4. **Actualizado:** Comentario del useEffect: "Dismiss keyboard on touchmove (user drag)"
+
+**Lógica Final:**
+
+- El teclado solo se oculta cuando el usuario arrastra físicamente el dedo por la pantalla (`touchmove`)
+- El auto-scroll del navegador (al abrir el teclado) ya no dispara el dismiss
+- Comportamiento natural: El usuario puede escribir normalmente, y el teclado se oculta solo cuando empieza a explorar los resultados
+
+**Resultado:**
+✅ Input de búsqueda funcional en móviles.
+✅ Teclado permanece abierto mientras el usuario escribe.
+✅ Dismiss inteligente solo al hacer scroll manual.
+✅ UX móvil restaurada completamente.

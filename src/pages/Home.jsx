@@ -44,20 +44,20 @@ export default function Home() {
     localStorage.setItem('toolfinder_view_mode', viewMode);
   }, [viewMode]);
 
-  // Dismiss keyboard on scroll
+  // Dismiss keyboard on touchmove (user drag)
   useEffect(() => {
-    const handleScroll = () => {
+    const handleTouchMove = () => {
       if (document.activeElement.tagName === 'INPUT') {
         document.activeElement.blur();
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('touchmove', handleScroll);
+
+    window.addEventListener('touchmove', handleTouchMove);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('touchmove', handleScroll);
+
+      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, []);
 
