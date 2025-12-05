@@ -96,6 +96,11 @@ export default function Layout() {
             </div>
           </div>
         </div>
+        
+        {/* Brand Signature */}
+        <div className="text-center pb-4 pt-6">
+          <p className="text-[10px] text-slate-600 font-mono">Engineered by Flex</p>
+        </div>
       </footer>
     </div>
   );
