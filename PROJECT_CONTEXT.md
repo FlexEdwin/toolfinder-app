@@ -143,7 +143,7 @@ src/components/tools/
 │   ├── Iconos h-8 (móvil) / h-48 (desktop)
 │   └── Footer con botones h-8 fijos
 ├── ToolListRow.jsx           # Vista List (P/N prominente)
-├── ToolFormModal.jsx         # CRUD Admin (validación de P/N único)
+├── ToolFormModal.jsx         # CRUD Admin (Smart Category Dropdown + P/N validation)
 └── CategoryManagerModal.jsx  # Renombrado de categorías
 ```
 
