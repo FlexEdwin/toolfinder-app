@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, Plus, Check } from 'lucide-react';
+import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, Plus, Check, AlertCircle, RefreshCw } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
 import ToolListRow from '../components/tools/ToolListRow';
 import { Link } from 'react-router-dom';
@@ -247,10 +247,24 @@ export default function Home() {
             <Loader2 className="animate-spin text-blue-600" size={40} />
           </div>
         ) : isError ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-red-200">
-            <Filter className="text-red-500 mb-4" size={48} />
-            <h3 className="text-lg font-bold text-red-700 mb-2">Error al cargar herramientas</h3>
-            <p className="text-red-600 text-sm">{error?.message || 'Ocurrió un error inesperado'}</p>
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border-2 border-red-200 shadow-lg">
+            <div className="bg-red-100 p-4 rounded-full mb-4">
+              <AlertCircle className="text-red-600" size={48} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Error de Conexión</h3>
+            <p className="text-slate-600 text-center max-w-md mb-1">
+              No pudimos cargar las herramientas. Verifica tu conexión a internet.
+            </p>
+            <p className="text-sm text-slate-500 mb-6">
+              {error?.message || 'Ocurrió un error inesperado'}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg active:scale-95"
+            >
+              <RefreshCw size={18} />
+              Reintentar
+            </button>
           </div>
         ) : (
           <>

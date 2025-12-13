@@ -11,6 +11,41 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [13/12/2025 14:57] - PERSISTENCIA DE CARRITO Y MEJORA DE MANEJO DE ERRORES
+
+**Objetivo:**
+Resolver pérdida de herramientas seleccionadas al recargar la página y mejorar UX en caso de errores de conexión.
+
+**Cambios Implementados:**
+
+1. **`src/context/KitContext.jsx` - Persistencia del Carrito**
+
+   - **Inicialización desde localStorage**: `selectedTools` lee de `'toolfinder_cart'` al montar
+   - **Auto-save con useEffect**: Guarda automáticamente en localStorage cada vez que cambia `selectedTools`
+   - **Manejo robusto de errores**: Try-catch en lectura/escritura con fallback a array vacío
+   - **Resultado**: Carrito persiste entre recargas de página
+
+2. **`src/pages/Home.jsx` - Error Component Amigable**
+   - **Componente de Error Mejorado**:
+     - Icono `AlertCircle` en círculo rojo de fondo
+     - Título claro: "Error de Conexión"
+     - Mensaje user-friendly: "Verifica tu conexión a internet"
+     - Detalles técnicos en texto secundario (error.message)
+   - **Botón "Reintentar"**:
+     - Ejecuta `refetch()` del hook `useTools`
+     - Icono `RefreshCw` con animación active:scale-95
+     - Estilos blue-600 con hover effects
+   - **Imports Agregados**: `AlertCircle`, `RefreshCw` de lucide-react
+
+**Resultado:**
+✅ Carrito persiste en localStorage automáticamente  
+✅ Usuario no pierde selecciones al recargar  
+✅ Errores de conexión se manejan con UI amigable  
+✅ Botón de reintento permite recuperación sin recargar página  
+✅ Mejor experiencia en conexiones inestables
+
+---
+
 ### [13/12/2025 14:18] - 📚 ACTUALIZACIÓN DE DOCUMENTACIÓN V1.0 (RELEASE CANDIDATE)
 
 **Objetivo:**
