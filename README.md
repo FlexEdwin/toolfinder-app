@@ -90,5 +90,5 @@ Hemos ejecutado SQLs avanzados. Las siguientes funciones y extensiones YA EXISTE
 ## 5. Próximos Pasos
 1. Debuggear `useTools` para confirmar que los parámetros llegan limpios al RPC.
 2. Eliminar filtrado cliente redundante.
-3. Verificar que `search_tools_smart` esté devolviendo todos los resultados esperados.
+3. Verificar que `search_tools_smart` esté devolviendo todos los resultados esperados..
 ````
