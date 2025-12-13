@@ -319,5 +319,18 @@ export default {
 
 ---
 
+## 8. Dependencias Clave Instaladas (Package.json Snapshot)
+
+- `react`: ^19.0
+- `vite`: ^7.0
+- `@tanstack/react-query`: ^5.0 (Gestión de estado asíncrono)
+- `lucide-react`: Iconos
+- `sonner`: Notificaciones
+- `@supabase/supabase-js`: Cliente DB
+- `vite-plugin-pwa`: Progressive Web App
+- `tailwindcss`: Estilos
+
+---
+
 **Última Actualización**: 13/12/2025  
 **Mantenedor**: Flex - Lead Developer
