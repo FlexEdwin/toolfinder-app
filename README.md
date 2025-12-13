@@ -171,6 +171,7 @@ npm run preview  # Preview local del build
 ### ✅ Smart Kits
 
 - [x] Selección multi-herramienta con feedback visual (+/✓)
+- [x] **Persistencia automática del carrito** (localStorage con auto-save)
 - [x] Creación de kits con autor y descripción
 - [x] Persistencia de formulario (localStorage)
 - [x] Modal de detalles con texto formateado
@@ -181,12 +182,11 @@ npm run preview  # Preview local del build
 
 - [x] Diseño ultra-compacto (3+ filas visibles en móvil)
 - [x] Auto-dismiss del teclado al hacer scroll
-- [x] Haptic feedback en selecc
-
-iones (Vibration API)
-
+- [x] Haptic feedback en selecciones (Vibration API)
 - [x] Botones de altura fija (h-8) y tipografía reducida (text-[10px])
 - [x] Badge de categoría en flujo normal (no obstruye imágenes)
+- [x] **Manejo amigable de errores** con botón de reintento
+- [x] Vista Grid/List toggle totalmente funcional
 
 ### ✅ PWA & Offline
 
@@ -201,6 +201,14 @@ iones (Vibration API)
 - [x] Gestión de categorías (crear/renombrar)
 - [x] Confirmación de eliminación (modal defensivo)
 - [x] Validación de Part Number único (constraint DB)
+
+### ✅ Resilience & Data Persistence
+
+- [x] **Cart persiste automáticamente** en localStorage (lee al iniciar, guarda al cambiar)
+- [x] Try-catch robusto en operaciones de storage
+- [x] Componente de error amigable con icono AlertCircle
+- [x] Botón "Reintentar" con función refetch() integrada
+- [x] Recuperación sin recargar página en errores de red
 
 ---
 

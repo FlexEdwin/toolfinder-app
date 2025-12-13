@@ -57,28 +57,6 @@ Progressive Web App empresarial que implementa:
 
 ### ✅ Fase 4: PWA & Image Management (Dic 2025)
 
-- Instalación de `vite-plugin-pwa`
-- Configuración de Service Worker (cache-first strategy)
-- Manifest.json con branding e iconos (192x192, 512x512)
-- Columna `image_url` en tabla `tools`
-- Integración con Supabase Storage (CDN externo)
-
-### ✅ Fase 5: Mobile UX Optimization (Dic 2025)
-
-- Rediseño ultra-compacto: tarjetas reducidas ~70%
-- Contador de progreso real ("Mostrando X de Y")
-- Vista Lista como default (mejor densidad)
-- Badge de categoría en flujo normal (no obstaculiza imágenes)
-- Botones h-8 fijos, tipografía text-[10px]/text-xs
-- Auto-dismiss del teclado al scroll
-- Haptic feedback (Vibration API)
-
----
-
-## 4. Problema Resuelto: Part Numbers Difíciles
-
-### Antes de ToolFinder
-
 ```
 Técnico: Necesito "MS-25083"... o era "MS25083-4"?
 Sistema Legacy: "No se encontraron resultados"
