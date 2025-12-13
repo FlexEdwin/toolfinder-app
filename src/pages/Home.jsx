@@ -293,9 +293,9 @@ export default function Home() {
               {/* View Toggle Buttons */}
               <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode('grid')}
                   className={`p-2 rounded transition-all ${
-                    viewMode === 'list' 
+                    viewMode === 'grid' 
                       ? 'bg-white text-blue-600 shadow-sm' 
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
@@ -318,7 +318,7 @@ export default function Home() {
             </div>
 
             {/* Conditional rendering based on view mode */}
-            {viewMode === 'list' ? (
+            {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {allTools.map(tool => (
                   <ToolCard 

@@ -11,6 +11,59 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [13/12/2025 15:04] - 🐛 FIX: BOTONES DE CAMBIO DE VISTA (GRID/LIST)
+
+**Problema:**
+Los botones para cambiar entre vista Grid y List no funcionaban. Ambos quedaban en la misma vista sin importar cuál se clicara.
+
+**Causa Raíz:**
+Bug de copy-paste en `Home.jsx` línea 296: Ambos botones llamaban `setViewMode('list')`.
+
+**Solución Aplicada:**
+
+**`src/pages/Home.jsx` (líneas 295-305)**
+
+- **Antes**: Botón Grid → `onClick={() => setViewMode('list')}` ❌
+- **Ahora**: Botón Grid → `onClick={() => setViewMode('grid')}` ✅
+- **Clases condicionales**: Actualizadas de `viewMode === 'list'` a `viewMode === 'grid'` para el botón correcto
+
+**Código Corregido:**
+
+```javascript
+// Botón Grid (corregido)
+<button
+  onClick={() => setViewMode('grid')}
+  className={`p-2 rounded transition-all ${
+    viewMode === 'grid'
+      ? 'bg-white text-blue-600 shadow-sm'
+      : 'text-slate-500 hover:text-slate-700'
+  }`}
+>
+  <LayoutGrid size={18} />
+</button>
+
+// Botón List (ya estaba correcto)
+<button onClick={() => setViewMode('list')} ...>
+  <List size={18} />
+</button>
+```
+
+**Resultado:**
+✅ Botón Grid cambia correctamente a vista de tarjetas  
+✅ Botón List cambia correctamente a vista de lista  
+✅ Estado visual refleja el modo activo (bg-white + text-blue-600)  
+✅ Persistencia en localStorage ya funcionaba (useEffect existente)
+
+**[ACTUALIZACIÓN 15:06]:**
+🐛 **Segunda Corrección - Lógica de Renderizado Invertida:**
+
+- **Problema**: Botones funcionaban pero vistas estaban invertidas (Grid mostraba lista, List mostraba grid)
+- **Causa**: Condicional en línea 321 estaba al revés: `viewMode === 'list'` renderizaba ToolCard (grid)
+- **Solución**: Invertido el ternario a `viewMode === 'grid'` → ToolCard (tarjetas)
+- ✅ Ahora Grid muestra tarjetas y List muestra filas correctamente
+
+---
+
 ### [13/12/2025 14:57] - PERSISTENCIA DE CARRITO Y MEJORA DE MANEJO DE ERRORES
 
 **Objetivo:**
