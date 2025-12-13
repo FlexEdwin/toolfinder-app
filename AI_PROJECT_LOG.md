@@ -11,6 +11,41 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [13/12/2025] - MEJORAS DE UX: CONTADOR REAL, VISTA POR DEFECTO Y TARJETAS MÓVILES
+
+**Objetivo:**
+Mejorar la experiencia del usuario mediante tres cambios clave: mostrar progreso real de carga, priorizar densidad de información, y optimizar visualización móvil.
+
+**Archivos Modificados:**
+
+1. **`src/pages/Home.jsx`:**
+
+   - **Vista por Defecto:** Cambiado el valor por defecto de `viewMode` de `'grid'` a `'list'` para nuevos usuarios
+     - Usuarios existentes mantienen su preferencia guardada en localStorage
+     - La vista de lista prioriza densidad de información
+   - **Contador de Progreso Real:** Actualizada lógica del badge azul:
+     - **Sin búsqueda/filtros:** "Explorando Inventario Global (X herramientas)"
+     - **Con búsqueda/filtros:** "Mostrando {allTools.length} de {totalCount} herramientas"
+     - Ejemplo: "Mostrando 40 de 2.735 herramientas"
+     - El usuario ahora ve cuántos items están cargados vs el total disponible
+
+2. **`src/components/tools/ToolCard.jsx`:**
+   - **Diseño Responsivo Móvil:** Aplicadas clases Tailwind responsive para compactar tarjetas en móvil:
+     - Padding contenedor: `p-3` (móvil) vs `md:p-4` (desktop)
+     - Título: `text-sm md:text-base` (antes `text-base` fijo)
+     - Espaciado elementos: `mb-2` (móvil) vs `mb-2.5/mb-3` (desktop)
+     - Footer padding: `p-2 md:p-2.5`
+     - Botones: `py-1 md:py-1.5`
+   - **Resultado:** Más tarjetas visibles en pantalla móvil sin sacrificar legibilidad en desktop
+
+**Resultado:**
+✅ Usuarios nuevos ven lista por defecto (mejor densidad).
+✅ Contador muestra progreso real de carga vs total disponible.
+✅ Tarjetas más compactas en móvil, más herramientas visibles por pantalla.
+✅ Experiencia responsive mejorada sin afectar desktop.
+
+---
+
 ### [01/12/2025] - MIGRACIÓN A ARQUITECTURA "SERVER-FIRST"
 
 **Objetivo:** Eliminar el filtrado en cliente para soportar miles de herramientas con alto rendimiento.

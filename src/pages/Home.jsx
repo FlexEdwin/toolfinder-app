@@ -25,7 +25,7 @@ export default function Home() {
   
   // View mode state with localStorage persistence
   const [viewMode, setViewMode] = useState(() => {
-    return localStorage.getItem('toolfinder_view_mode') || 'grid';
+    return localStorage.getItem('toolfinder_view_mode') || 'list';
   });
   
   // Local UI state
@@ -286,9 +286,9 @@ export default function Home() {
               {/* View Toggle Buttons */}
               <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
                 <button
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode('list')}
                   className={`p-2 rounded transition-all ${
-                    viewMode === 'grid' 
+                    viewMode === 'list' 
                       ? 'bg-white text-blue-600 shadow-sm' 
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
@@ -311,7 +311,7 @@ export default function Home() {
             </div>
 
             {/* Conditional rendering based on view mode */}
-            {viewMode === 'grid' ? (
+            {viewMode === 'list' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {allTools.map(tool => (
                   <ToolCard 

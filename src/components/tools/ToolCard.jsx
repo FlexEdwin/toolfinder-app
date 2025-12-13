@@ -85,7 +85,7 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
         </div>
       )}
 
-      <div className="p-4 flex-grow">
+      <div className="p-3 md:p-4 flex-grow">
         {/* Image or Icon */}
         {tool.image_url && !imageError ? (
           <div className="mb-3 w-full h-48 rounded-lg overflow-hidden bg-slate-100">
@@ -104,15 +104,13 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
           </div>
         )}
 
-        <div className="mb-2.5">
-          <h3 className="font-semibold text-slate-800 leading-tight text-base">
+        <div className="mb-2">`n          <h3 className="font-semibold text-slate-800 leading-tight text-sm md:text-base">
             {tool.name}
           </h3>
         </div>
 
         {tool.specs && (
-           <div className="mb-3">
-             <span className="inline-flex items-center text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+           <div className="mb-2">`n             <span className="inline-flex items-center text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
                ⚙️ {typeof tool.specs === 'object' ? JSON.stringify(tool.specs) : tool.specs}
              </span>
            </div>
@@ -127,10 +125,10 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
       </div>
 
       {/* Footer de Acciones */}
-      <div className="p-2.5 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
+      <div className="p-2 md:p-2.5 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
         <button 
           onClick={copyToClipboard}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1 md:py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
         >
           {copied ? UI_LABELS.TOOL_ACTION_COPIED : <><Copy size={14} /> {UI_LABELS.TOOL_ACTION_COPY}</>}
         </button>
