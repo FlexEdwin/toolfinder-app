@@ -11,6 +11,80 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [13/12/2025 16:59] - 🎯 ADMIN UX: DROPDOWN INTELIGENTE DE CATEGORÍAS
+
+**Objetivo:**
+Prevenir duplicados y errores tipográficos en categorías mediante un selector inteligente que guíe al administrador.
+
+**Problema Previo:**
+
+- Campo de texto libre permitía crear categorías duplicadas con variantes tipográficas
+- No había visibilidad de categorías existentes durante la edición
+- Creación accidental de nuevas categorías por errores de escritura
+- Inconsistencia en el catálogo (ej: "Herramientas Manuales" vs "herramientas manuales")
+
+**Solución Implementada en `src/components/tools/ToolFormModal.jsx`:**
+
+1. **Dropdown con Autocomplete Visual:**
+
+   - Input con filtrado en tiempo real mientras se escribe
+   - Icono `ChevronDown` que rota al abrir/cerrar (UX feedback)
+   - Lista desplegable con categorías existentes filtradas
+   - Scroll para listas largas (max-h-60)
+
+2. **Selección de Categorías Existentes:**
+
+   - Botones hover con `hover:bg-blue-50`
+   - Icono `Check` junto a la categoría actualmente seleccionada
+   - Click cierra el dropdown automáticamente
+
+3. **Opción "+ Crear Nueva Categoría":**
+
+   - Aparece cuando `categoryFilter` no coincide con ninguna existente
+   - Diseño distintivo: fondo verde `hover:bg-green-50`, icono `Plus`
+   - Muestra preview: "Crear nueva categoría: "{texto escrito}""
+   - Borde punteado superior para separación visual
+
+4. **UX Defensiva:**
+
+   - Click fuera del dropdown lo cierra (`useRef` + `useEffect`)
+   - Helper text amber cuando se creará nueva categoría (no exactMatch)
+   - Placeholder: "Buscar o seleccionar categoría..."
+
+5. **Estado Manejado:**
+   - `showCategoryDropdown`: Controla visibilidad del menú
+   - `categoryFilter`: Texto del input (separado de `formData.category`)
+   - `filteredCategories`: Lista filtrada en tiempo real
+
+**Imports Agregados:**
+
+- `ChevronDown`, `Plus`, `Check` de lucide-react
+- `useRef` de react (para detectar clicks fuera)
+
+**Código Clave**:
+
+```javascript
+const filteredCategories = existingCategories.filter((cat) =>
+  cat.toLowerCase().includes(categoryFilter.toLowerCase())
+);
+
+const showCreateOption =
+  categoryFilter.trim() && filteredCategories.length === 0;
+const exactMatch = existingCategories.some(
+  (cat) => cat.toLowerCase() === categoryFilter.toLowerCase()
+);
+```
+
+**Resultado:**
+✅ Reducción drástica de categorías duplicadas  
+✅ Admin ve todas las opciones disponibles antes de crear  
+✅ Búsqueda instantánea mientras escribe  
+✅ UX clara para diferenciar "seleccionar" vs "crear"  
+✅ Consistencia en nomenclatura del catálogo  
+✅ Prevención de typos (sugiere opciones similares al filtrar)
+
+---
+
 ### [13/12/2025 15:04] - 🐛 FIX: BOTONES DE CAMBIO DE VISTA (GRID/LIST)
 
 **Problema:**

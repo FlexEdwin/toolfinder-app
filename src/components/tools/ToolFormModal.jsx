@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Save, Loader2, ExternalLink, Image } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Save, Loader2, ExternalLink, Image, ChevronDown, Plus, Check } from 'lucide-react';
 
 export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingCategories = [] }) {
   const [formData, setFormData] = useState({
@@ -13,6 +13,11 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [imageError, setImageError] = useState(false);
+  
+  // Category dropdown state
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const dropdownRef = useRef(null);
 
   // Pre-fill form when editing
   useEffect(() => {
@@ -25,6 +30,7 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
         keywords: tool.keywords || '',
         image_url: tool.image_url || ''
       });
+      setCategoryFilter(tool.category || '');
     } else {
       // Reset form for create mode
       setFormData({
@@ -35,10 +41,28 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
         keywords: '',
         image_url: ''
       });
+      setCategoryFilter('');
     }
     setErrors({});
     setImageError(false);
   }, [tool, isOpen]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter categories based on input
+  const filteredCategories = existingCategories.filter(cat =>
+    cat.toLowerCase().includes(categoryFilter.toLowerCase())
+  );
 
   const validate = () => {
     const newErrors = {};
@@ -62,7 +86,7 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
 
     setLoading(true);
     try {
-      await onSave(formData);
+      await onSave( formData);
       onClose();
     } catch (error) {
       // Error handling is done in parent component
@@ -76,12 +100,29 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error for this field when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({  ...prev, [field]: undefined }));
+      setErrors(prev => ({ ...prev, [field]: undefined }));
     }
     // Reset image error when URL changes
     if (field === 'image_url') {
       setImageError(false);
     }
+  };
+
+  const handleCategoryInputChange = (value) => {
+    setCategoryFilter(value);
+    handleChange('category', value);
+    setShowCategoryDropdown(true);
+  };
+
+  const handleCategorySelect = (category) => {
+    handleChange('category', category);
+    setCategoryFilter(category);
+    setShowCategoryDropdown(false);
+  };
+
+  const handleCreateNewCategory = () => {
+    handleChange('category', categoryFilter);
+    setShowCategoryDropdown(false);
   };
 
   /**
@@ -97,6 +138,9 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
   };
 
   if (!isOpen) return null;
+
+  const showCreateOption = categoryFilter.trim() && filteredCategories.length === 0;
+  const exactMatch = existingCategories.some(cat => cat.toLowerCase() === categoryFilter.toLowerCase());
 
   return (
     <div 
@@ -167,25 +211,75 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
             )}
           </div>
 
-          {/* Category */}
-          <div>
+          {/* Category - Custom Dropdown with Autocomplete */}
+          <div className="relative" ref={dropdownRef}>
             <label className="block text-sm font-bold text-slate-700 mb-1">
               Categoría
             </label>
-            <input
-              type="text"
-              list="categories"
-              value={formData.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-              className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Ej: Herramientas Manuales"
-              disabled={loading}
-            />
-            <datalist id="categories">
-              {existingCategories.map(cat => (
-                <option key={cat} value={cat} />
-              ))}
-            </datalist>
+            <div className="relative">
+              <input
+                type="text"
+                value={categoryFilter}
+                onChange={(e) => handleCategoryInputChange(e.target.value)}
+                onFocus={() => setShowCategoryDropdown(true)}
+                className="w-full p-3 pr-10 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Buscar o seleccionar categoría..."
+                disabled={loading}
+              />
+              <ChevronDown 
+                className={`absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-transform ${
+                  showCategoryDropdown ? 'rotate-180' : ''
+                }`}
+                size={20}
+              />
+            </div>
+
+            {/* Dropdown List */}
+            {showCategoryDropdown && (
+              <div className="absolute w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                {filteredCategories.length > 0 ? (
+                  <div className="py-1">
+                    {filteredCategories.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => handleCategorySelect(category)}
+                        className="w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors flex items-center justify-between group"
+                      >
+                        <span className="text-slate-700">{category}</span>
+                        {formData.category === category && (
+                          <Check size={16} className="text-blue-600" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : showCreateOption ? (
+                  <button
+                    type="button"
+                    onClick={handleCreateNewCategory}
+                    className="w-full px-4 py-3 text-left hover:bg-green-50 transition-colors flex items-center gap-2 text-green-700 font-medium border-t-2 border-dashed border-green-200"
+                  >
+                    <Plus size={18} className="flex-shrink-0" />
+                    <div>
+                      <div>Crear nueva categoría:</div>
+                      <div className="text-sm font-bold">&quot;{categoryFilter}&quot;</div>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="px-4 py-3 text-slate-500 text-sm text-center">
+                    Escribe para buscar o crear una categoría
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Helper text */}
+            {!exactMatch && categoryFilter.trim() && !showCategoryDropdown && (
+              <p className="text-amber-600 text-xs mt-1 flex items-center gap-1">
+                <Plus size={12} />
+                Se creará como nueva categoría
+              </p>
+            )}
           </div>
 
           {/* Specs */}
