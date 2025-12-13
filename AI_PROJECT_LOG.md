@@ -37,20 +37,83 @@ Mejorar la experiencia del usuario mediante tres cambios clave: mostrar progreso
      - Footer padding: `p-2 md:p-2.5`
      - Botones: `py-1 md:py-1.5`
    - **Resultado:** Más tarjetas visibles en pantalla móvil sin sacrificar legibilidad en desktop
-
-**Resultado:**
-✅ Usuarios nuevos ven lista por defecto (mejor densidad).
-✅ Contador muestra progreso real de carga vs total disponible.
-✅ Tarjetas más compactas en móvil, más herramientas visibles por pantalla.
-✅ Experiencia responsive mejorada sin afectar desktop.
+     **Resultado:**
+     ✅ Usuarios nuevos ven lista por defecto (mejor densidad).
+     ✅ Contador muestra progreso real de carga vs total disponible.
+     ✅ Tarjetas más compactas en móvil, más herramientas visibles por pantalla.
+     ✅ Experiencia responsive mejorada sin afectar desktop.
 
 ---
 
-### [01/12/2025] - MIGRACIÓN A ARQUITECTURA "SERVER-FIRST"
+### [13/12/2025 13:40] - CORRECCIÓN DE BUGS: REESCRITURA DE ARCHIVOS
 
-**Objetivo:** Eliminar el filtrado en cliente para soportar miles de herramientas con alto rendimiento.
+**Problema:**
+Ediciones previas vía PowerShell causaron bugs visuales y lógicos:
 
-**Backend (Supabase & SQL):**
+1. **ToolCard.jsx:** Caracteres `\`n` renderizados en pantalla (backtick-n)
+2. **Home.jsx:** Contador no mostraba progreso numérico siempre
+
+**Solución Implementada:**
+
+1. **`src/components/tools/ToolCard.jsx` - Reescritura Completa:**
+
+   - **Bug Eliminado:** Removidos todos los caracteres `\`n` que aparecían como texto
+   - **Altura Dinámica Corregida:**
+     - **Con imagen:** `className="mb-3 w-full h-32 md:h-48"`
+     - **Sin imagen (solo icono):** `className="w-full flex justify-center items-center mb-2 h-12 md:h-48"`
+   - Archivo completamente reescrito (no edición parcial) para garantizar limpieza
+
+2. **`src/pages/Home.jsx` - Contador Simplificado:**
+   - **Nueva Lógica:** El badge SIEMPRE muestra:
+     ```
+     Mostrando {allTools.length} de {totalCount} herramientas
+     ```
+   - Eliminada lógica condicional de "Explorando Inventario Global"
+   - Usuario ve progreso numérico en todo momento
+
+**Resultado:**
+✅ Interfaz limpia sin caracteres extraños.
+✅ Contador consistente y claro en todas las situaciones.
+✅ Alturas dinámicas correctamente aplicadas (h-12 móvil para iconos, h-48 desktop).
+
+---
+
+### [13/12/2025 13:47] - REDISEÑO ULTRA-COMPACTO PARA MÓVIL
+
+**Objetivo:**
+Maximizar tarjetas visibles en móvil (objetivo: 3 filas completas en pantalla).
+
+**Cambios Implementados en `src/components/tools/ToolCard.jsx`:**
+
+1. **Badge de Categoría Flotante:**
+
+   - Removido del flujo normal con `absolute top-2 right-2 z-10`
+   - Ahorra espacio vertical eliminando la fila superior
+
+2. **Contenedor de Imagen/Icono:**
+
+   - **Con imagen:** `h-24 md:h-48` (50% más compacto en móvil)
+   - **Sin imagen (solo icono):** `h-8 md:h-48` (ultra compacto)
+   - Removido `bg-slate-50` en móvil para iconos (más limpio)
+
+3. **Tipografía Compacta:**
+
+   - Nombre herramienta: `text-xs font-bold leading-tight` (vs text-sm anterior)
+   - Part Number: `text-[10px]` (vs text-base anterior)
+   - Specs: `text-[10px] md:text-xs`
+
+4. **Footer de Acciones:**
+
+   - Botones con altura fija: `h-8` en móvil
+   - Padding reducido: `p-2` (vs p-2.5 anterior)
+   - Iconos más pequeños: `size={12}` en móvil
+
+5. **Padding General:**
+   - Contenedor: `p-2 md:p-4` (mitad del padding en móvil)
+   - Espaciado entre elementos: `mb-1` vs `mb-2/mb-3`
+
+**Resultado:**
+✅ Tarjetas ~70% más compactas en móvil.
 
 - **Extensiones:** Activadas `pg_trgm` (Trigramas) y `unaccent`.
 - **Índices:** Creado índice GIN `idx_tools_search_fuzzy` para búsqueda instantánea.

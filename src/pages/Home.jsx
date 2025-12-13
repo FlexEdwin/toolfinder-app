@@ -161,7 +161,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 pb-20">
       
       {/* SECCIÓN SUPERIOR */}
-      <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm pt-6 pb-6 px-4 shadow-md transition-all">
+      <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-sm pt-6 pb-6 px-4 shadow-md transition-all">
         <div className="max-w-6xl mx-auto space-y-6">
           
           <div className="max-w-3xl">
@@ -260,17 +260,10 @@ export default function Home() {
                 <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
                   {loadingCount ? (
                     <span className="text-blue-600 text-sm">Contando...</span>
-                  ) : !searchTerm ? (
-                    <span className="text-blue-900 font-bold text-sm sm:text-base">
-                      {UI_LABELS.RESULTS_EXPLORING} {selectedCategory === UI_LABELS.CATEGORY_ALL ? UI_LABELS.HOME_TITLE : selectedCategory} ({totalCount.toLocaleString()} {UI_LABELS.RESULTS_TOOLS})
-                    </span>
                   ) : (
-                    <>
-                      <span className="text-blue-900 font-bold text-lg">{totalCount.toLocaleString()}</span>
-                      <span className="text-blue-600 text-sm ml-2">
-                        {totalCount === 1 ? UI_LABELS.RESULTS_FOUND_SINGULAR : UI_LABELS.RESULTS_FOUND_PLURAL}
-                      </span>
-                    </>
+                    <span className="text-blue-900 font-bold text-sm sm:text-base">
+                      Mostrando {allTools.length} de {totalCount.toLocaleString()} {totalCount === 1 ? 'herramienta' : 'herramientas'}
+                    </span>
                   )}
                 </div>
                 {(searchTerm || selectedCategory !== "Todas") && (

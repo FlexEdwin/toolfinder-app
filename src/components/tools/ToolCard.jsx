@@ -4,8 +4,9 @@ import { useKit } from '../../context/KitContext';
 import UI_LABELS from '../../constants/uiLabels';
 
 /**
- * ToolCard Component
+ * ToolCard Component - Ultra-Compact Mobile Design
  * Displays a tool in card format with actions (copy, select, edit, delete)
+ * Optimized for mobile: fits 3 rows on screen
  * 
  * @param {Object} props - Component props
  * @param {Object} props.tool - Tool object with name, part_number, category, specs
@@ -30,10 +31,10 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
    */
   const getIcon = (category) => {
     const cat = category?.toLowerCase() || '';
-    if (cat.includes('eléctrico') || cat.includes('electric')) return <Zap size={18} />;
-    if (cat.includes('seguridad')) return <Shield size={18} />;
-    if (cat.includes('medición')) return <Ruler size={18} />;
-    return <Wrench size={18} />;
+    if (cat.includes('eléctrico') || cat.includes('electric')) return <Zap size={16} />;
+    if (cat.includes('seguridad')) return <Shield size={16} />;
+    if (cat.includes('medición')) return <Ruler size={16} />;
+    return <Wrench size={16} />;
   };
 
   /**
@@ -48,13 +49,6 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
   return (
     <div className={`bg-white rounded-xl border transition-all relative flex flex-col h-full group ${isSelected ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 shadow-lg' : 'border-slate-200 shadow-sm hover:shadow-md'}`}>
       
-      {/* Badge de Categoría */}
-      <div className="absolute top-0 right-0">
-        <span className="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-bl-lg rounded-tr-lg uppercase tracking-wider bg-slate-100 text-slate-500 border-b border-l border-slate-200">
-          {tool.category}
-        </span>
-      </div>
-
       {/* Admin Controls */}
       {isAdmin && (onEdit || onDelete) && (
         <div className="absolute top-2 left-2 flex gap-1 z-10">
@@ -85,10 +79,17 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
         </div>
       )}
 
-      <div className="p-3 md:p-4 flex-grow">
-        {/* Image or Icon */}
+      <div className="p-2 md:p-4 flex-grow">
+        {/* Badge de Categoría - En flujo normal, alineado a la derecha */}
+        <div className="w-full flex justify-end mb-1">
+          <span className="inline-block px-1.5 md:px-2.5 py-0.5 text-[10px] font-bold rounded-lg uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">
+            {tool.category}
+          </span>
+        </div>
+
+        {/* Image or Icon - Ultra compacto en móvil, sin margen superior */}
         {tool.image_url && !imageError ? (
-          <div className="mb-3 w-full h-48 rounded-lg overflow-hidden bg-slate-100">
+          <div className="mb-2 w-full h-24 md:h-48 rounded-lg overflow-hidden bg-slate-100 mt-0">
             <img
               src={tool.image_url}
               alt={tool.name}
@@ -97,40 +98,42 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
             />
           </div>
         ) : (
-          <div className="mb-2.5">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2.5 transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
+          <div className="w-full flex justify-center items-center mb-1 h-8 md:h-48 md:bg-slate-50 md:rounded-lg mt-0">
+            <div className={`w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
               {getIcon(tool.category)}
             </div>
           </div>
         )}
 
-        <div className="mb-2">`n          <h3 className="font-semibold text-slate-800 leading-tight text-sm md:text-base">
+        <div className="mb-1">
+          <h3 className="font-bold text-slate-800 leading-tight text-xs md:text-base">
             {tool.name}
           </h3>
         </div>
 
         {tool.specs && (
-           <div className="mb-2">`n             <span className="inline-flex items-center text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+           <div className="mb-1 md:mb-2">
+             <span className="inline-flex items-center text-[10px] md:text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
                ⚙️ {typeof tool.specs === 'object' ? JSON.stringify(tool.specs) : tool.specs}
              </span>
            </div>
         )}
 
-        <div className="flex items-center gap-2 mt-auto">
-          <span className="text-xs font-bold text-slate-400 uppercase">P/N:</span>
-          <code className="font-mono text-blue-700 font-bold text-base select-all">
+        <div className="flex items-center gap-1 md:gap-2 mt-auto">
+          <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">P/N:</span>
+          <code className="font-mono text-blue-700 font-bold text-[10px] md:text-base select-all">
             {tool.part_number}
           </code>
         </div>
       </div>
 
-      {/* Footer de Acciones */}
-      <div className="p-2 md:p-2.5 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
+      {/* Footer de Acciones - Ultra compacto */}
+      <div className="p-2 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
         <button 
           onClick={copyToClipboard}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-1 md:py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+          className={`flex-1 flex items-center justify-center gap-1 h-8 md:h-auto md:py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
         >
-          {copied ? UI_LABELS.TOOL_ACTION_COPIED : <><Copy size={14} /> {UI_LABELS.TOOL_ACTION_COPY}</>}
+          {copied ? UI_LABELS.TOOL_ACTION_COPIED : <><Copy size={12} className="md:w-3.5 md:h-3.5" /> {UI_LABELS.TOOL_ACTION_COPY}</>}
         </button>
 
         {/* BOTÓN MÁGICO DE SELECCIÓN */}
@@ -142,14 +145,14 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
             }
             toggleTool(tool);
           }}
-          className={`p-2 rounded-lg border transform transition-all duration-200 active:scale-95 ${
+          className={`h-8 md:h-auto md:p-2 px-2 rounded-lg border transform transition-all duration-200 active:scale-95 ${
             isSelected 
               ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
               : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100'
           }`}
           title={isSelected ? UI_LABELS.TOOL_ACTION_REMOVE : UI_LABELS.TOOL_ACTION_ADD}
         >
-          {isSelected ? <Check size={18} /> : <Plus size={18} />}
+          {isSelected ? <Check size={16} className="md:w-4.5 md:h-4.5" /> : <Plus size={16} className="md:w-4.5 md:h-4.5" />}
         </button>
       </div>
     </div>
