@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { Search, Filter, Loader2, PlusCircle, LayoutGrid, List, Copy, Plus, Check, AlertCircle, RefreshCw } from 'lucide-react';
 import ToolCard from '../components/tools/ToolCard';
 import ToolListRow from '../components/tools/ToolListRow';
+import FeaturedKits from '../components/kits/FeaturedKits';
 import { Link } from 'react-router-dom';
 import { useKit } from '../context/KitContext';
 import { ArrowRight } from 'lucide-react';
@@ -242,6 +243,11 @@ export default function Home() {
 
       {/* RESULTADOS */}
       <div className="max-w-6xl mx-auto px-4">
+        {!searchTerm && selectedCategory === "Todas" && (
+          <div className="mt-4 pb-4 border-b border-slate-100 mb-6">
+            <FeaturedKits />
+          </div>
+        )}
         {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-blue-600" size={40} />

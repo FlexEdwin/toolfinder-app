@@ -105,6 +105,17 @@ count_tools_smart(
 - Retorna el total de resultados sin límite de paginación
 - Usado para el contador "Mostrando X de Y"
 
+### Diccionario de Datos (Aclaraciones Semánticas)
+
+- **Tabla `tools` -> columna `name`**: Representa la **Denominación Técnica Completa** (Descripción) de la herramienta (Ej: "LLAVE MIXTA 1/2").
+- **Tabla `kits` -> columna `name`**: Representa el **Título Corto** del kit asignado por el usuario (Ej: "Kit Rueda").
+
+### Nuevas Funciones (RPC)
+
+- **`get_popular_kits`**: Retorna los top 5 kits con más herramientas.
+  - Output: `id`, `name` (del kit), `author_name`, `tool_count`.
+  - _Nota:_ No devuelve descripción.
+
 **3. `get_distinct_categories`**
 
 ```sql
@@ -144,7 +155,9 @@ src/components/tools/
 │   └── Footer con botones h-8 fijos
 ├── ToolListRow.jsx           # Vista List (P/N prominente)
 ├── ToolFormModal.jsx         # CRUD Admin (Smart Category Dropdown + P/N validation)
-└── CategoryManagerModal.jsx  # Renombrado de categorías
+├── CategoryManagerModal.jsx  # Renombrado de categorías
+└── kits/
+    └── FeaturedKits.jsx      # Carrusel de kits populares (Real Data + Skeletons)
 ```
 
 ### Custom Hooks
@@ -160,6 +173,18 @@ export function useTools({ search, category }) {
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.length === 20 ? lastPage + 1 : undefined,
+  });
+}
+```
+
+**`usePopularKits.js`** (Top Kits)
+
+```javascript
+export function usePopularKits() {
+  return useQuery({
+    queryKey: ["popularKits"],
+    queryFn: () => supabase.rpc("get_popular_kits"),
+    staleTime: 300000, // 5 minutos
   });
 }
 ```

@@ -11,6 +11,31 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [15/12/2025] - 🌟 FEATURED KITS PROTOTYPE (MOCK)
+
+**Objetivo:**
+Validar visualmente la sección de "Kits Destacados" antes de conectar con el backend.
+
+**Implementación:**
+
+- **Componente Nuevo:** `src/components/kits/FeaturedKitsMock.jsx`
+- **Datos Mock:** 4 kits estáticos con autores y conteo de herramientas.
+- **Layout Responsivo:**
+  - **Móvil:** Carrusel horizontal (`overflow-x-auto`, `snap-x`) con scroll oculto.
+  - **Desktop:** Grid de 4 columnas.
+- **Integración:** Se muestra en `Home.jsx` solo cuando no hay búsqueda activa (`!searchTerm`).
+
+**Resultado:**
+✅ Visualización inmediata de kits destacados.
+✅ UX móvil fluida con snap scrolling.
+
+**[UPDATE 15/12/2025 11:05] - MEJORA VISUAL KITS:**
+
+- Añadida separación visual con línea sutil y `bg-slate-50` en tarjetas.
+- Título estilizado con icono `Sparkles` y texto uppercase.
+
+---
+
 ### [13/12/2025 16:59] - 🎯 ADMIN UX: DROPDOWN INTELIGENTE DE CATEGORÍAS
 
 **Objetivo:**
