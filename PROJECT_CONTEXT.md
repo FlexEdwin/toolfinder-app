@@ -324,7 +324,6 @@ export default {
 - [ ] **A11y Audit**: ARIA labels, keyboard navigation
 - [ ] **i18n**: Implementar react-i18next (strings ya centralizados)
 - [ ] **Analytics**: Integrar Plausible/Posthog (búsquedas frecuentes)
-- [ ] **Barcode Scanner**: Usar ZXing para búsqueda por escaneo
 - [ ] **Export Kits**: Generar PDF de kit para impresión
 
 ---
