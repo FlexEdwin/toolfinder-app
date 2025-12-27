@@ -44,6 +44,39 @@ Renombrar la aplicación para reflejar su nueva identidad comercial "AeroStock" 
 
 ---
 
+### [27/12/2025] - 🖼️ ZOOM DE IMAGEN PARA HERRAMIENTAS
+
+**Objetivo:**
+Permitir a los usuarios ver las imágenes de las herramientas en tamaño completo al hacer clic sobre ellas.
+
+**Implementación:**
+
+1. **Nuevo Componente:** `src/components/tools/ImageZoomModal.jsx`
+
+   - Modal a pantalla completa con fondo oscuro (`bg-black/85`).
+   - Imagen centrada con tamaño máximo responsivo (`max-w-[90vw] max-h-[85vh]`).
+   - Botón de cierre (X) en esquina superior derecha.
+   - Cierre al hacer clic fuera de la imagen o presionar `Escape`.
+   - Bloqueo de scroll del body mientras está abierto.
+   - Caption con el nombre de la herramienta.
+
+2. **Integración en `ToolCard.jsx`:**
+
+   - Imagen envuelta en `<button>` con `cursor-zoom-in`.
+   - Estado `showZoom` controla visibilidad del modal.
+   - Anillo de focus para accesibilidad (`focus:ring-2`).
+
+3. **Integración en `ToolListRow.jsx`:**
+   - Misma lógica aplicada a la miniatura de la vista de lista.
+
+**Resultado:**
+✅ Click en imagen abre modal de zoom a pantalla completa.
+✅ Experiencia consistente en vistas Grid y List.
+✅ Accesible por teclado (Escape para cerrar).
+✅ Scroll del body bloqueado durante visualización.
+
+---
+
 ### [15/12/2025] - 🌟 FEATURED KITS PROTOTYPE (MOCK)
 
 **Objetivo:**

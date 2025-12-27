@@ -2,6 +2,7 @@ import { Copy, Plus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2 } from 'l
 import { useState } from 'react';
 import { useKit } from '../../context/KitContext';
 import UI_LABELS from '../../constants/uiLabels';
+import ImageZoomModal from './ImageZoomModal';
 
 /**
  * ToolCard Component - Ultra-Compact Mobile Design
@@ -19,6 +20,7 @@ import UI_LABELS from '../../constants/uiLabels';
 export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [showZoom, setShowZoom] = useState(false);
   const { selectedTools, toggleTool } = useKit();
 
   // Verificar si esta herramienta ya está en el carrito
@@ -89,14 +91,18 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
 
         {/* Image or Icon - Ultra compacto en móvil, sin margen superior */}
         {tool.image_url && !imageError ? (
-          <div className="mb-2 w-full h-24 md:h-48 rounded-lg overflow-hidden bg-slate-100 mt-0">
+          <button 
+            type="button"
+            onClick={() => setShowZoom(true)}
+            className="mb-2 w-full h-24 md:h-48 rounded-lg overflow-hidden bg-slate-100 mt-0 cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <img
               src={tool.image_url}
               alt={tool.name}
               className="w-full h-full object-contain"
               onError={() => setImageError(true)}
             />
-          </div>
+          </button>
         ) : (
           <div className="w-full flex justify-center items-center mb-1 h-8 md:h-48 md:bg-slate-50 md:rounded-lg mt-0">
             <div className={`w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`}>
@@ -155,6 +161,14 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
           {isSelected ? <Check size={16} className="md:w-4.5 md:h-4.5" /> : <Plus size={16} className="md:w-4.5 md:h-4.5" />}
         </button>
       </div>
+
+      {/* Image Zoom Modal */}
+      <ImageZoomModal
+        isOpen={showZoom}
+        onClose={() => setShowZoom(false)}
+        imageUrl={tool.image_url}
+        altText={tool.name}
+      />
     </div>
   );
 }

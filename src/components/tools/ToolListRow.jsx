@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PlusCircle, Filter, Copy, Plus, Check } from 'lucide-react';
 import { useKit } from '../../context/KitContext';
+import ImageZoomModal from './ImageZoomModal';
 
 /**
  * ToolListRow Component
@@ -16,6 +17,7 @@ import { useKit } from '../../context/KitContext';
 export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [showZoom, setShowZoom] = useState(false);
   const { selectedTools, toggleTool } = useKit();
   const isSelected = selectedTools.some(t => t.id === tool.id);
 
@@ -49,14 +51,18 @@ export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {/* Image or Emoji Icon */}
         {tool.image_url && !imageError ? (
-          <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setShowZoom(true)}
+            className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <img
               src={tool.image_url}
               alt={tool.name}
               className="w-full h-full object-cover"
               onError={() => setImageError(true)}
             />
-          </div>
+          </button>
         ) : (
           <span className="text-2xl flex-shrink-0">{getIcon(tool.category)}</span>
         )}
@@ -128,6 +134,14 @@ export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
           {isSelected ? <Check size={16} /> : <Plus size={16} />}
         </button>
       </div>
+
+      {/* Image Zoom Modal */}
+      <ImageZoomModal
+        isOpen={showZoom}
+        onClose={() => setShowZoom(false)}
+        imageUrl={tool.image_url}
+        altText={tool.name}
+      />
     </div>
   );
 }
