@@ -17,7 +17,7 @@ export default function Layout() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight hover:text-blue-400 transition-colors">
             <Wrench className="text-blue-500" size={24} />
-            ToolFinder <span className="text-xs bg-slate-700 px-1.5 py-0.5 rounded text-slate-300 ml-1 font-mono">DEMO</span>
+            AeroStock <span className="text-xs bg-slate-700 px-1.5 py-0.5 rounded text-slate-300 ml-1 font-mono">DEMO</span>
           </Link>
 
           {/* Navegación Desktop */}
@@ -80,15 +80,15 @@ export default function Layout() {
           
           <div className="text-center md:text-left">
             <h4 className="text-white font-bold flex items-center gap-2 justify-center md:justify-start">
-              <Wrench size={14} /> ToolFinder
+              <Wrench size={14} /> AeroStock
             </h4>
             <p className="mt-1 opacity-70">Acceso libre para estandarización operativa.</p>
           </div>
 
           <div className="text-center md:text-right">
             <p className="mb-1">Desarrollado por <span className="text-white font-bold">FLEX</span></p>
-            <a href="mailto:flexedwin@hotmail.com" className="hover:text-blue-400 transition-colors">
-              Soporte: flexedwin@hotmail.com
+            <a href="mailto:hello@flexedwin.com" className="hover:text-blue-400 transition-colors">
+              Soporte: hello@flexedwin.com
             </a>
             {/* Link discreto para admin */}
             <div className="mt-2">

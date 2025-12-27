@@ -1,4 +1,4 @@
-# AI PROJECT LOG - ToolFinder
+# AI PROJECT LOG - AeroStock
 
 ## Estado Actual del Proyecto
 
@@ -10,6 +10,39 @@
 ---
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
+
+### [27/12/2025] - 🚀 REBRANDING: DE TOOLFINDER A AEROSTOCK
+
+**Objetivo:**
+Renombrar la aplicación para reflejar su nueva identidad comercial "AeroStock" y actualizar los canales de contacto oficiales.
+
+**Cambios Realizados:**
+
+1. **Identidad Visual y Texto UI:**
+
+   - **Nombre:** Actualizado de "ToolFinder" a "AeroStock" en toda la interfaz (Logo, Footer, Títulos).
+   - **Anuncio:** Actualizado el mensaje de bienvenida en `SystemAnnouncement.jsx`.
+   - **Metadatos:** Actualizado el `<title>` en `index.html` y el nombre en `package.json`.
+
+2. **Canales de Soporte:**
+
+   - **Email:** El correo de contacto cambió de `flexedwin@hotmail.com` a `hello@flexedwin.com` en el Footer de `Layout.jsx`.
+
+3. **Configuración Técnica (PWA & Persistencia):**
+
+   - **PWA Manifest:** Actualizado `name` y `short_name` en `vite.config.js` para reflejar el nuevo nombre al instalar la app.
+   - **LocalStorage:** Cambiadas las claves de persistencia de vista de `toolfinder_view_mode` a `aerostock_view_mode` en `Home.jsx` para mantener la coherencia con la nueva marca.
+
+4. **Documentación del Proyecto:**
+   - **Archivos:** Actualizados `PROJECT_CONTEXT.md`, `PROJECT_BRIEF.md`, `SYSTEM_PROMPT.md` y `README.md`.
+   - **Registro:** Esta bitácora (`AI_PROJECT_LOG.md`) ha sido renombrada internamente para seguir el contexto de AeroStock.
+
+**Resultado:**
+✅ Marca AeroStock implementada consistentemente.
+✅ Contacto oficial actualizado a hello@flexedwin.com.
+✅ Persistencia de datos y configuración PWA alineadas con la nueva identidad.
+
+---
 
 ### [15/12/2025] - 🌟 FEATURED KITS PROTOTYPE (MOCK)
 

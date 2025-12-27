@@ -1,4 +1,4 @@
-# ToolFinder – Project Brief & Evolution
+# AeroStock – Project Brief & Evolution
 
 ---
 
@@ -18,14 +18,14 @@ En entornos de mantenimiento aeronáutico, los técnicos reciben tickets de trab
 
 ---
 
-## 2. La Solución: ToolFinder
+## 2. La Solución: AeroStock
 
 Progressive Web App empresarial que implementa:
 
 1. **Búsqueda Semántica Fuzzy**: Motor basado en PostgreSQL Trigram Search con tolerancia a errores tipográficos (similitud > 0.3)
 2. **Biblioteca Visual**: Integración con Supabase Storage para imágenes de herramientas
 3. **Smart Kits**: Sistema de agrupación colaborativa con compartición via WhatsApp
-4. **Offline-First**: PWA con Service Worker para acceso sin conexión
+4. **Offline-First**: AeroStock con Service Worker para acceso sin conexión
 5. **Mobile-Optimized**: UX ultra-compacta diseñada para uso con una sola mano
 
 ---
@@ -37,7 +37,7 @@ Progressive Web App empresarial que implementa:
 - Migración de búsqueda cliente a búsqueda servidor (PostgreSQL FTS)
 - Implementación de React Query para state management
 - Custom RPCs: `search_tools_smart`, `count_tools_smart`, `get_distinct_categories`
-- Índices GIN con `pg_trgm` y `unaccent`
+- Índices GIN con `pg_trgm` and `unaccent`
 
 ### ✅ Fase 2: Data Quality & UI Foundations (Nov-Dic 2025)
 
@@ -63,11 +63,11 @@ Sistema Legacy: "No se encontraron resultados"
 Resultado: Viaje al almacén para consultar físicamente
 ```
 
-### Con ToolFinder
+### Con AeroStock
 
 ```
 Técnico: Busca "ms 25083" (con espacios y minúsculas)
-ToolFinder: [Encuentra automáticamente MS25083-4-25]
+AeroStock: [Encuentra automáticamente MS25083-4-25]
          + Muestra imagen y especificaciones
          + Botón "Copiar P/N" con un tap
 Resultado: Solicitud correcta en segundos
@@ -199,8 +199,8 @@ Resultado: Solicitud correcta en segundos
 
 ---
 
-**Proyecto**: ToolFinder  
+**Proyecto**: AeroStock  
 **Versión**: 1.0.0 (Production)  
-**Última Actualización**: 13/12/2025  
+**Última Actualización**: 27/12/2025  
 **Autor**: Flex - Lead Developer  
 **Licencia**: Propietario

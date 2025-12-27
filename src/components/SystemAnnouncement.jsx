@@ -41,7 +41,7 @@ export default function SystemAnnouncement() {
         <div className="space-y-5 mb-8">
           <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 text-slate-700 leading-relaxed">
             <p className="mb-4">
-              <span className="font-bold text-slate-900">Bienvenido a ToolFinder.</span> Actualmente estamos en una fase de despliegue activo y optimización. Es posible que encuentres intermitencias o errores puntuales mientras mejoramos la plataforma.
+              <span className="font-bold text-slate-900">Bienvenido a AeroStock.</span> Actualmente estamos en una fase de despliegue activo y optimización. Es posible que encuentres intermitencias o errores puntuales mientras mejoramos la plataforma.
             </p>
             <p>
               <span className="font-bold text-slate-900">Tu colaboración es fundamental:</span> si detectas fallos, tienes ideas de mejora o deseas contribuir, por favor contacta al administrador. Recordemos que esta herramienta la construimos entre todos para el beneficio de todos.

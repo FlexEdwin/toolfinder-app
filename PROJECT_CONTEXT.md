@@ -1,4 +1,4 @@
-# PROJECT CONTEXT: ToolFinder
+# PROJECT CONTEXT: AeroStock
 
 > **Documento técnico para LLMs**: Este archivo proporciona contexto completo del proyecto, arquitectura actual, y decisiones técnicas para facilitar colaboración con IA en futuras sesiones.
 
@@ -299,8 +299,8 @@ export default {
 
 ```json
 {
-  "name": "ToolFinder",
-  "short_name": "ToolFinder",
+  "name": "AeroStock",
+  "short_name": "AeroStock",
   "theme_color": "#0f172a",
   "background_color": "#f8fafc",
   "display": "standalone",

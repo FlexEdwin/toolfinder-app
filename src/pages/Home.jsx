@@ -26,7 +26,7 @@ export default function Home() {
   
   // View mode state with localStorage persistence
   const [viewMode, setViewMode] = useState(() => {
-    return localStorage.getItem('toolfinder_view_mode') || 'list';
+    return localStorage.getItem('aerostock_view_mode') || 'list';
   });
   
   // Local UI state
@@ -42,7 +42,7 @@ export default function Home() {
 
   // Persist view mode changes to localStorage
   useEffect(() => {
-    localStorage.setItem('toolfinder_view_mode', viewMode);
+    localStorage.setItem('aerostock_view_mode', viewMode);
   }, [viewMode]);
 
   // Dismiss keyboard on touchmove (user drag)

@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['vite.svg', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'ToolFinder by Flex',
-        short_name: 'ToolFinder',
+        name: 'AeroStock by Flex',
+        short_name: 'AeroStock',
         description: 'Gestión inteligente de herramientas aeronáuticas.',
         theme_color: '#0f172a',
         background_color: '#0f172a',
