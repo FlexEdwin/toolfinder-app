@@ -11,6 +11,22 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [07/01/2026] - 🧹 LIMPIEZA POST-TEMPORADA: REMOCIÓN DE MENSAJE FESTIVO
+
+**Objetivo:**
+Actualizar la interfaz de bienvenida para enero de 2026, eliminando los saludos de fin de año que ya no son relevantes.
+
+**Cambios Realizados:**
+
+1.  **`src/components/SystemAnnouncement.jsx`:**
+    - Eliminado el párrafo: `"¡Saludos y felices fiestas!"`.
+    - Mantenida la estructura del anuncio con el estado del proyecto y la firma.
+
+**Resultado:**
+✅ Interfaz actualizada y contextualmente correcta para el nuevo año.
+
+---
+
 ### [27/12/2025] - 🚀 REBRANDING: DE TOOLFINDER A AEROSTOCK
 
 **Objetivo:**

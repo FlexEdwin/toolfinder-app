@@ -48,9 +48,7 @@ export default function SystemAnnouncement() {
             </p>
           </div>
 
-          <p className="text-slate-600 text-center font-medium italic">
-            "¡Saludos y felices fiestas!"
-          </p>
+
         </div>
 
         {/* Signature */}
