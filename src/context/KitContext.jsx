@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const KitContext = createContext();
 
 const STORAGE_KEY = 'toolfinder_cart';
+const STORAGE_KEY_EDITING = 'toolfinder_editing_kit';
 
 export function KitProvider({ children }) {
   // Inicializar desde localStorage
@@ -16,7 +17,17 @@ export function KitProvider({ children }) {
     }
   });
 
-  // Persistir en localStorage cada vez que cambie selectedTools
+  const [editingKit, setEditingKit] = useState(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_EDITING);
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error('Error loading editing kit from localStorage:', error);
+      return null;
+    }
+  });
+
+  // Persistir en localStorage cada vez que cambie selectedTools o editingKit
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedTools));
@@ -24,6 +35,18 @@ export function KitProvider({ children }) {
       console.error('Error saving cart to localStorage:', error);
     }
   }, [selectedTools]);
+
+  useEffect(() => {
+    try {
+      if (editingKit) {
+        localStorage.setItem(STORAGE_KEY_EDITING, JSON.stringify(editingKit));
+      } else {
+        localStorage.removeItem(STORAGE_KEY_EDITING);
+      }
+    } catch (error) {
+      console.error('Error saving editing kit to localStorage:', error);
+    }
+  }, [editingKit]);
 
   // Agregar herramienta al "carrito"
   const toggleTool = (tool) => {
@@ -39,12 +62,37 @@ export function KitProvider({ children }) {
     });
   };
 
-  const clearKit = () => setSelectedTools([]);
+  const clearKit = () => {
+    setSelectedTools([]);
+    setEditingKit(null);
+  };
+
+  // Cargar un kit para editarlo
+  const setKitForEditing = (kit) => {
+    setEditingKit({
+      id: kit.id,
+      name: kit.name,
+      author_name: kit.author_name,
+      description: kit.description || ''
+    });
+    
+    // Extraer herramientas del formato del backend (kit.kit_items[].tools)
+    const toolsForCart = (kit.kit_items || []).map(item => ({
+      id: item.tool_id || item.tools?.id, 
+      name: item.tools?.name,
+      part_number: item.tools?.part_number,
+      category: item.tools?.category
+    })).filter(t => t.id); // Asegurar que tengan ID válido
+    
+    setSelectedTools(toolsForCart);
+  };
 
   const value = {
     selectedTools,
     toggleTool,
     clearKit,
+    setKitForEditing,
+    editingKit,
     count: selectedTools.length
   };
 

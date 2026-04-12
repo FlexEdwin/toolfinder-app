@@ -181,13 +181,10 @@ export default function ToolFormModal({ isOpen, onClose, tool, onSave, existingC
                 errors.part_number ? 'border-red-500' : 'border-slate-300'
               } focus:ring-2 focus:ring-blue-500 outline-none`}
               placeholder="Ej: H-20-MED"
-              disabled={loading || !!tool} // Disable editing part_number for existing tools
+              disabled={loading}
             />
             {errors.part_number && (
               <p className="text-red-500 text-sm mt-1">{errors.part_number}</p>
-            )}
-            {tool && (
-              <p className="text-slate-500 text-xs mt-1">El Part Number no se puede modificar</p>
             )}
           </div>
 

@@ -11,6 +11,37 @@
 
 ## REGISTRO DE CAMBIOS (Bitácora Técnica)
 
+### [12/04/2026] - 🚀 EDICIÓN DE KITS, DEEP LINKING Y APERTURA DE P/N PARA ADMINS
+
+**Objetivo:**
+Empoderar a los administradores para actualizar Listas (Kits) existentes y corregir números de parte (P/N), y lanzar la función "Compartir" de herramientas con enlaces directos para todos los usuarios.
+
+**Implementación Técnica:**
+
+1. **Edición de Listas (Kits):**
+   - **`KitContext.jsx`:** Implementado el estado `editingKit` e hidratado/persistido desde `localStorage` (`toolfinder_editing_kit`), junto a la función `setKitForEditing(kit)` que transfiere las herramientas de un kit al carrito e informa a `CreateKit.jsx`.
+   - **`KitCard.jsx` & `Kits.jsx`:** Añadido botón "Editar Lista" (icono `Pencil`) junto a los controles de Admin, que dispara `setKitForEditing` y redirige a `/create`.
+   - **`CreateKit.jsx`:** Adaptado a una vista dual (Crear/Actualizar). Si detecta `editingKit`, las operaciones DB mutan de `INSERT` a un ciclo de `UPDATE` (de cabecera) y regeneración de ítems (`DELETE` / `INSERT` en `kit_items`).  
+
+2. **Edición Restringida de P/N Eliminada:**
+   - **`ToolFormModal.jsx`:** Retirado el candado estricto `disabled` bajo la heurística de edición de Part Numbers. Supabase ya provee colisión y restricción mediante la política de errores (`23505`), lo que permite que la capa visual acceda a modificar estos registros.
+
+3. **Compartir / Deep Linking (Para Todos):**
+   - **`ToolCard.jsx` / `ToolListRow.jsx`:** Añadido un botón de "Compartir" con icono `Share2`. Mediante `navigator.clipboard.writeText`, el sistema genera una URL única tipo `/?search=PN`.
+   - **`Home.jsx`:** Conectado el hook del estado inicial `useState` del `searchTerm` a evaluar nativamente `new URLSearchParams(window.location.search).get('search')`, logrando que un usuario que navega por el deep link obtenga la herramienta deseada precargada y en primer plano instantáneamente al arrancar.
+
+**Resultado:**
+✅ Capacidad vitalicia de control de datos completa para Administradores.
+✅ Productividad ampliada globalmente al compartir material entre operarios por URL.
+✅ Integración con el carrito atómicamente transaccional.
+
+**[UPDATE - FIX URGENTE]:**
+- **Problema:** Guardar una edición de kit devolvía `duplicate key value violates unique constraint "unique_tool_in_kit"`.
+- **Causa:** El método original empleaba un borrado destructivo seguido de una inserción del carrito completo. Debido a que las reglas de seguridad de PostgreSQL (RLS) omitían secretamente las acciones de DELETE por los roles de la interfaz asíncrona, estos jamás se borraban. Al intentar re-insertarlos el servidor bloqueaba los duplicados, causando el error rojo.
+- **Solución:** Introducimos Lógica Diferencial en `CreateKit.jsx`. El frontend cruza una petición SQL `SELECT` de las herramientas reales previas de ese kit vs las herramientas actuales seleccionadas en memoria para calcular el vector matemático de diferencias, disparando peticiones optimizadas que garantizan evitar la sobre-represarización de ítems repetidos. Acciones de "Añadir" funcionan a la perfección.
+
+---
+
 ### [07/01/2026] - 🧹 LIMPIEZA POST-TEMPORADA: REMOCIÓN DE MENSAJE FESTIVO
 
 **Objetivo:**

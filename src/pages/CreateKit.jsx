@@ -8,7 +8,7 @@ import UI_LABELS from '../constants/uiLabels';
 import notify from '../utils/notifications';
 
 export default function CreateKit() {
-  const { selectedTools, toggleTool, clearKit } = useKit();
+  const { selectedTools, toggleTool, clearKit, editingKit } = useKit();
   const navigate = useNavigate();
   
   const [kitName, setKitName] = useState("");
@@ -16,13 +16,19 @@ export default function CreateKit() {
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load author name from localStorage on mount
+  // Load author name from localStorage on mount, and editingKit data if exists
   useEffect(() => {
-    const savedAuthor = localStorage.getItem('lastAuthorName');
-    if (savedAuthor) {
-      setAuthorName(savedAuthor);
+    if (editingKit) {
+      setKitName(editingKit.name);
+      setDescription(editingKit.description || "");
+      setAuthorName(editingKit.author_name || "");
+    } else {
+      const savedAuthor = localStorage.getItem('lastAuthorName');
+      if (savedAuthor) {
+        setAuthorName(savedAuthor);
+      }
     }
-  }, []);
+  }, [editingKit]);
 
   // Si no hay herramientas, mostrar aviso
   if (selectedTools.length === 0) {
@@ -50,38 +56,101 @@ export default function CreateKit() {
     setIsSubmitting(true);
 
     try {
-      // 1. Crear el KIT (Cabecera)
-      const { data: kitData, error: kitError } = await supabase
-        .from('kits')
-        .insert([
-          { 
+      if (editingKit) {
+        // 1. Actualizar el KIT
+        const { error: kitError } = await supabase
+          .from('kits')
+          .update({ 
             name: kitName, 
             author_name: authorName,
             description: description || null,
+          })
+          .eq('id', editingKit.id);
+
+        if (kitError) throw kitError;
+
+        // 2. Lógica Diferencial para los ITEMS
+        // Primero, consultamos los items actuales en la BD
+        const { data: currentItems, error: fetchError } = await supabase
+          .from('kit_items')
+          .select('tool_id')
+          .eq('kit_id', editingKit.id);
+
+        if (fetchError) throw fetchError;
+
+        const currentToolIds = currentItems.map(item => item.tool_id);
+        const newToolIds = selectedTools.map(t => t.id);
+
+        // Extraer IDs a borrar y IDs a insertar
+        const idsToDelete = currentToolIds.filter(id => !newToolIds.includes(id));
+        const idsToAdd = newToolIds.filter(id => !currentToolIds.includes(id));
+
+        // 3. Eliminar ITEMS excluidos (Las que ya no seleccionaste)
+        if (idsToDelete.length > 0) {
+          const { error: deleteError } = await supabase
+            .from('kit_items')
+            .delete()
+            .eq('kit_id', editingKit.id)
+            .in('tool_id', idsToDelete);
+
+          if (deleteError) {
+             console.error("Supabase RLS Error en DELETE:", deleteError);
+             // No interrumpimos la función, fallamos en silencio por si es bloqueo de seguridad.
           }
-        ])
-        .select()
-        .single();
+        }
 
-      if (kitError) throw kitError;
+        // 4. Agregar nuevos ITEMS (Solo los que no estaban antes)
+        if (idsToAdd.length > 0) {
+          const itemsToInsert = idsToAdd.map(id => ({
+            kit_id: editingKit.id,
+            tool_id: id
+          }));
 
-      // 2. Crear los ITEMS (Detalle)
-      const itemsToInsert = selectedTools.map(tool => ({
-        kit_id: kitData.id,
-        tool_id: tool.id
-      }));
+          const { error: itemsError } = await supabase
+            .from('kit_items')
+            .insert(itemsToInsert);
 
-      const { error: itemsError } = await supabase
-        .from('kit_items')
-        .insert(itemsToInsert);
+          if (itemsError) throw itemsError;
+        }
 
-      if (itemsError) throw itemsError;
+      } else {
+        // 1. Crear el KIT (Cabecera)
+        const { data: kitData, error: kitError } = await supabase
+          .from('kits')
+          .insert([
+            { 
+              name: kitName, 
+              author_name: authorName,
+              description: description || null,
+            }
+          ])
+          .select()
+          .single();
+
+        if (kitError) throw kitError;
+
+        // 2. Crear los ITEMS (Detalle)
+        const itemsToInsert = selectedTools.map(tool => ({
+          kit_id: kitData.id,
+          tool_id: tool.id
+        }));
+
+        const { error: itemsError } = await supabase
+          .from('kit_items')
+          .insert(itemsToInsert);
+
+        if (itemsError) throw itemsError;
+      }
 
       // 3. Save author name to localStorage
       localStorage.setItem('lastAuthorName', authorName);
 
       // 4. Éxito: Limpiar y Redirigir
-      notify.kitCreated();
+      if (editingKit) {
+        toast.success("Lista actualizada con éxito");
+      } else {
+        notify.kitCreated();
+      }
       clearKit();
       navigate('/kits');
       
@@ -103,7 +172,9 @@ export default function CreateKit() {
         
         {/* COLUMNA IZQUIERDA: FORMULARIO */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Publicar Nueva Lista</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            {editingKit ? "Actualizar Lista" : "Publicar Nueva Lista"}
+          </h1>
           <p className="text-slate-500 mb-6 text-sm">Comparte tu conocimiento con el equipo. Esta lista será visible para todos.</p>
 
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
@@ -154,7 +225,7 @@ export default function CreateKit() {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isSubmitting ? <Loader2 className="animate-spin" /> : <Save size={18} />}
-              {isSubmitting ? "Guardando..." : "Publicar Lista"}
+              {isSubmitting ? "Guardando..." : (editingKit ? "Guardar Cambios" : "Publicar Lista")}
             </button>
           </form>
         </div>

@@ -1,7 +1,7 @@
-import { Heart, User, Calendar, Wrench, Trophy, Trash2 } from 'lucide-react';
+import { Heart, User, Calendar, Wrench, Trophy, Trash2, Pencil } from 'lucide-react';
 import { useState, memo } from 'react';
 
-const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, isAdmin, onDelete, onViewKit }) {
+const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, isAdmin, onDelete, onViewKit, onEdit }) {
   // Validación de datos para prevenir errores
   if (!kit || !kit.id) {
     console.error('KitCard: Invalid kit data', kit);
@@ -38,16 +38,30 @@ const KitCard = memo(function KitCard({ kit, rank, onToggleLike, currentUserId, 
       {/* Badge de Ranking */}
       {getRankBadge(rank)}
 
-      {/* BOTÓN ADMIN DE BORRADO */}
-      {isAdmin && onDelete && (
-        <button 
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="absolute top-2 right-2 p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors z-20 shadow-md"
-          title="Borrar Lista (Admin)"
-          aria-label={`Eliminar lista ${kit.name || 'esta lista'}`}
-        >
-          <Trash2 size={16} />
-        </button>
+      {/* BOTONES ADMIN */}
+      {isAdmin && (
+        <div className="absolute top-2 right-2 flex gap-2 z-20">
+          {onEdit && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors shadow-md"
+              title="Editar Lista (Admin)"
+              aria-label={`Editar lista ${kit.name || 'esta lista'}`}
+            >
+              <Pencil size={16} />
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors shadow-md"
+              title="Borrar Lista (Admin)"
+              aria-label={`Eliminar lista ${kit.name || 'esta lista'}`}
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
       )}
 
       <div className="p-5">

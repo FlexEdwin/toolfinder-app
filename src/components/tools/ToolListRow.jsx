@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { PlusCircle, Filter, Copy, Plus, Check } from 'lucide-react';
+import { PlusCircle, Filter, Copy, Plus, Check, Share2 } from 'lucide-react';
 import { useKit } from '../../context/KitContext';
+import { toast } from 'sonner';
 import ImageZoomModal from './ImageZoomModal';
 
 /**
@@ -21,13 +22,19 @@ export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
   const { selectedTools, toggleTool } = useKit();
   const isSelected = selectedTools.some(t => t.id === tool.id);
 
-  /**
-   * Copy part number to clipboard
-   */
   const copyToClipboard = () => {
     navigator.clipboard.writeText(tool.part_number);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  /**
+   * Share tool link to clipboard
+   */
+  const shareTool = () => {
+    const url = `${window.location.origin}/?search=${encodeURIComponent(tool.part_number)}`;
+    navigator.clipboard.writeText(url);
+    toast.success('Link copiado al portapapeles');
   };
 
   /**
@@ -114,6 +121,14 @@ export default function ToolListRow({ tool, isAdmin, onEdit, onDelete }) {
           title="Copiar P/N"
         >
           <Copy size={14} />
+        </button>
+
+        <button
+          onClick={shareTool}
+          className="p-1.5 text-slate-600 hover:bg-slate-100 hover:text-blue-600 rounded transition-colors"
+          title="Compartir herramienta"
+        >
+          <Share2 size={14} />
         </button>
 
         <button

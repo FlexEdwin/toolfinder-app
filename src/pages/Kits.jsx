@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, TrendingUp, AlertCircle, X, Copy, Share2 } from 'lucide-react';
+import { Loader2, TrendingUp, AlertCircle, X, Copy, Share2, Pencil } from 'lucide-react';
 import KitCard from '../components/social/KitCard';
 import { useAuth } from '../context/AuthContext';
+import { useKit } from '../context/KitContext';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import UI_LABELS from '../constants/uiLabels';
 import notify from '../utils/notifications';
@@ -12,29 +14,16 @@ export default function Kits() {
   const [kits, setKits] = useState([]);
   const [loading, setLoading] = useState(true);
   const anonId = localStorage.getItem('toolfinder_anon_id');
+  const navigate = useNavigate();
+  const { setKitForEditing } = useKit();
   
   // Modal state
   const [selectedKit, setSelectedKit] = useState(null);
   const [showKitModal, setShowKitModal] = useState(false);
 
   const fetchKits = async () => {
-    try {
-      const { data: kitsData, error } = await supabase
-        .rpc('get_kits_with_likes', { user_session_id: anonId })
-        .order('likes_count', { ascending: false });
-
-      if (error) {
-        console.warn('RPC function not found, using fallback method');
-        return await fetchKitsFallback();
-      }
-
-      setKits(kitsData || []);
-    } catch (err) {
-      console.error("Error cargando kits:", err);
-      await fetchKitsFallback();
-    } finally {
-      setLoading(false);
-    }
+    // Force fallback to guarantee we select 'id' explicitly
+    await fetchKitsFallback();
   };
 
   const fetchKitsFallback = async () => {
@@ -44,7 +33,8 @@ export default function Kits() {
         .select(`
           *,
           kit_items (
-            tools ( name, part_number, category )
+            tool_id,
+            tools ( id, name, part_number, category )
           )
         `)
         .order('created_at', { ascending: false });
@@ -66,6 +56,8 @@ export default function Kits() {
       setKits(sortedKits);
     } catch (err) {
       console.error("Error en fallback:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,6 +101,11 @@ export default function Kits() {
   const closeKitModal = () => {
     setShowKitModal(false);
     setSelectedKit(null);
+  };
+
+  const handleEditKit = (kit) => {
+    setKitForEditing(kit);
+    navigate('/create');
   };
 
   // Generate clean text for sharing
@@ -175,6 +172,7 @@ export default function Kits() {
                 onToggleLike={handleToggleLike}
                 currentUserId={anonId}
                 isAdmin={!!user}
+                onEdit={() => handleEditKit(kit)}
                 onDelete={() => handleDeleteKit(kit.id)}
                 onViewKit={handleViewKit}
               />
@@ -277,12 +275,23 @@ export default function Kits() {
                 </button>
               </div>
               
-              <button 
-                onClick={closeKitModal}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors font-medium"
-              >
-                {UI_LABELS.MODAL_ACTION_CLOSE}
-              </button>
+              <div className="flex gap-2">
+                {!!user && (
+                  <button 
+                    onClick={() => handleEditKit(selectedKit)}
+                    className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors font-bold flex items-center gap-2"
+                  >
+                    <Pencil size={16} />
+                    Editar Lista
+                  </button>
+                )}
+                <button 
+                  onClick={closeKitModal}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors font-medium"
+                >
+                  {UI_LABELS.MODAL_ACTION_CLOSE}
+                </button>
+              </div>
             </div>
           </div>
         </div>

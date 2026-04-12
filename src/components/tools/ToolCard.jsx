@@ -1,6 +1,7 @@
-import { Copy, Plus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Plus, Check, Zap, Shield, Wrench, Ruler, Pencil, Trash2, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { useKit } from '../../context/KitContext';
+import { toast } from 'sonner';
 import UI_LABELS from '../../constants/uiLabels';
 import ImageZoomModal from './ImageZoomModal';
 
@@ -46,6 +47,15 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
     navigator.clipboard.writeText(tool.part_number);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  /**
+   * Share tool link to clipboard
+   */
+  const shareTool = () => {
+    const url = `${window.location.origin}/?search=${encodeURIComponent(tool.part_number)}`;
+    navigator.clipboard.writeText(url);
+    toast.success('Link copiado al portapapeles');
   };
 
   return (
@@ -133,13 +143,21 @@ export default function ToolCard({ tool, isAdmin, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* Footer de Acciones - Ultra compacto */}
       <div className="p-2 border-t border-slate-100 flex gap-2 bg-slate-50/50 rounded-b-xl">
         <button 
           onClick={copyToClipboard}
           className={`flex-1 flex items-center justify-center gap-1 h-8 md:h-auto md:py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+          title="Copiar P/N"
         >
-          {copied ? UI_LABELS.TOOL_ACTION_COPIED : <><Copy size={12} className="md:w-3.5 md:h-3.5" /> {UI_LABELS.TOOL_ACTION_COPY}</>}
+          {copied ? UI_LABELS.TOOL_ACTION_COPIED : <><Copy size={12} className="md:w-3.5 md:h-3.5" /> <span className="hidden md:inline">{UI_LABELS.TOOL_ACTION_COPY}</span></>}
+        </button>
+
+        <button 
+          onClick={shareTool}
+          className="h-8 md:h-auto md:p-2 px-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition-all shadow-sm"
+          title="Compartir herramienta"
+        >
+          <Share2 size={16} className="md:w-4.5 md:h-4.5" />
         </button>
 
         {/* BOTÓN MÁGICO DE SELECCIÓN */}

@@ -30,7 +30,9 @@ export default function Home() {
   });
   
   // Local UI state
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return new URLSearchParams(window.location.search).get('search') || "";
+  });
   const [selectedCategory, setSelectedCategory] = useState("Todas");
   
   // Admin CRUD state

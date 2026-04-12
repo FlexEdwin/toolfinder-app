@@ -229,12 +229,12 @@ export function useCategories() {
 
 - `selectedTools`: Array de herramientas seleccionadas
 - **Inicialización**: Lee de `localStorage.getItem('toolfinder_cart')` al montar
-- **Auto-save**: `useEffect` guarda automáticamente en localStorage cada vez que cambia
-- **Error handling**: Try-catch en lectura/escritura con fallback a `[]`
+- **Auto-save**: `useEffect` guarda automáticamente en localStorage
+- `editingKit`: Guarda el estado del Kit que se está editando (solo Admin).
+- `setKitForEditing(kit)`: Carga un kit existente al carrito para editarlo.
 - `toggleTool(tool)`: Add/remove con haptic feedback
-- `clearKit()`: Vacía el carrito
+- `clearKit()`: Vacía el carrito y limpia `editingKit`
 - `count`: Número de selecciones
-- **Resultado**: Carrito persiste entre recargas de página
 
 ### Sistema de Constantes (`uiLabels.js`)
 
